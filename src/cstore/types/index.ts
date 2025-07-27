@@ -1,33 +1,47 @@
-export interface CStoreBaseResponse {
+// Base response structure with proper typing
+export interface CStoreBaseResponse<T = unknown> {
+  result: T
+  server_node_addr: string
+  evm_network: string
   ee_node_alias: string
-  server_version: string
-  server_time: string
-  server_current_epoch: number
-  server_uptime: string
+  ee_node_address: string
+  ee_node_eth_address: string
+  ee_node_network: string
+  ee_node_ver: string
   [key: string]: any
 }
 
-export interface CStoreStatusResponse extends CStoreBaseResponse {
-  keys: string[]
+// Specific response types with proper result typing
+export interface CStoreStatusResponse extends CStoreBaseResponse<boolean> {
+  keys?: string[]
 }
 
-export interface CStoreValueResponse extends CStoreBaseResponse {
-  [cstore_key: string]: any
+export interface CStoreGetResponse extends CStoreBaseResponse<string> {
 }
 
-export interface CStoreHashResponse extends CStoreBaseResponse {
-  [hkey: string]: { [key: string]: any } | any
+export interface CStoreSetResponse extends CStoreBaseResponse<boolean> {
 }
 
+export interface CStoreHSetResponse extends CStoreBaseResponse<boolean> {
+}
+
+export interface CStoreHGetResponse extends CStoreBaseResponse<string> {
+}
+
+export interface CStoreHGetAllResponse extends CStoreBaseResponse<Record<string, any>> {
+}
+
+// Value types for chain store operations
 export type ChainStoreValue = string | number | boolean | object | any[]
 
+// Request interfaces
 export interface GetValueRequest {
-  cstoreKey: string
+  key: string
 }
 
 export interface SetValueRequest {
-  cstoreKey: string
-  chainstoreValue: ChainStoreValue
+  key: string
+  value: ChainStoreValue
 }
 
 export interface HashSetValueRequest {

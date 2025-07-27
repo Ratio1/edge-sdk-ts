@@ -2,7 +2,7 @@ import fetch from "cross-fetch"
 export interface RequestOptions {
   method: 'GET' | 'POST'
   headers?: Record<string, string>
-  body?: string | FormData
+  body?: string | FormData | any
 }
 
 export class BaseClient {
@@ -21,8 +21,8 @@ export class BaseClient {
       console.debug('[ratio1-edge-node-client] response', { url, status: res.status, duration })
     }
     if (!res.ok) {
-      const err = new Error(`Request failed with status ${res.status}`)
-      ;(err as any).response = res
+      const err = new Error(`Request failed with status ${res.status}`);
+      (err as any).response = res
       throw err
     }
     return res

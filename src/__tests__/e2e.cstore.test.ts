@@ -12,27 +12,27 @@ describe('cstore e2e', () => {
   })
 
   it('set_value stores a value', async () => {
-    const res = await client.cstore.setValue({ cstoreKey: storedKey, chainstoreValue: 1 })
-    expect(res[storedKey]).toBe(1)
+    const res = await client.cstore.setValue({ key: storedKey, value: 1 })
+    expect(res.result).toBe(true)
   })
 
   it('get_value returns the stored value', async () => {
-    const res = await client.cstore.getValue({ cstoreKey: storedKey })
-    expect(res[storedKey]).toBe(1)
+    const res = await client.cstore.getValue({ key: storedKey })
+    expect(res.result).toBe("1")
   })
 
-  it('hash_set_value stores a hash entry', async () => {
+  it('hset stores a hash entry', async () => {
     const res = await client.cstore.hashSetValue({ hkey: 'e2e-hkey', key: 'k1', value: 'v1' })
-    expect(res['e2e-hkey'].k1).toBe('v1')
+    expect(res.result).toBe(true)
   })
 
   it('hash_get_value retrieves the hash entry', async () => {
     const res = await client.cstore.hashGetValue({ hkey: 'e2e-hkey', key: 'k1' })
-    expect(res['e2e-hkey'].k1).toBe('v1')
+    expect(res.result).toBe('v1')
   })
 
   it('hgetall returns all hash values', async () => {
     const res = await client.cstore.hgetall({ hkey: 'e2e-hkey' })
-    expect(res['e2e-hkey'].k1).toBeDefined()
+    expect(res.result.k1).toBe('v1')
   })
 })
