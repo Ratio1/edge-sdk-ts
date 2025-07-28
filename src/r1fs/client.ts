@@ -1,12 +1,13 @@
 import { BaseClient } from '../baseClient'
 import {
-  StatusResponse,
-  UploadFileRequest,
-  UploadBase64Request,
-  UploadResponse,
-  DownloadFileRequest,
-  DownloadResponse,
-  UploadMetadata
+  type R1FSStatusResult,
+  type R1FSUploadResult,
+  type R1FSDownloadResult,
+  type R1FSBaseResponse,
+  type UploadFileRequest,
+  type UploadBase64Request,
+  type DownloadFileRequest,
+  type UploadMetadata
 } from './types'
 
 // Use native FormData in browsers, fall back to form-data package in Node.js
@@ -22,20 +23,20 @@ if (typeof globalThis !== 'undefined' && globalThis.FormData) {
 }
 
 export class R1FSClient extends BaseClient {
-  async getStatus (): Promise<StatusResponse> {
+  async getStatus (): Promise<R1FSBaseResponse<R1FSStatusResult>> {
     const res = await this.request('/get_status', { method: 'GET' })
     return await res.json()
   }
 
-  async addFile ({ formData }: UploadFileRequest): Promise<UploadResponse> {
+  async addFile ({ formData }: UploadFileRequest): Promise<R1FSBaseResponse<R1FSUploadResult>> {
     // Extract metadata from the original FormData
     const file = formData.get('file') as File | Buffer;
     const filename = formData.get('filename') as string;
     const secret = formData.get('secret') as string;
-    
+
     // Create a new FormData with the correct structure
     const uploadFormData = new FormDataImpl();
-    
+
     // Handle file upload based on environment and file type
     if (typeof globalThis !== 'undefined' && globalThis.FormData) {
       // Browser environment - use native FormData
@@ -60,12 +61,12 @@ export class R1FSClient extends BaseClient {
         (uploadFormData as any).append('file', file, { filename: filename || 'file' });
       }
     }
-    
+
     // Create body object with metadata and stringify it
     const bodyData: UploadMetadata = {};
     if (filename) bodyData.filename = filename;
     if (secret) bodyData.secret = secret;
-    
+
     // Add the stringified body as a separate field
     uploadFormData.append('body', JSON.stringify(bodyData));
 
@@ -74,7 +75,7 @@ export class R1FSClient extends BaseClient {
     return responseData
   }
 
-  async addFileBase64 (data: UploadBase64Request): Promise<UploadResponse> {
+  async addFileBase64 (data: UploadBase64Request): Promise<R1FSBaseResponse<R1FSUploadResult>> {
     const res = await this.request('/add_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,7 +90,7 @@ export class R1FSClient extends BaseClient {
     return response
   }
 
-  async getFileBase64 ({ cid, secret }: DownloadFileRequest): Promise<DownloadResponse> {
+  async getFileBase64 ({ cid, secret }: DownloadFileRequest): Promise<R1FSBaseResponse<R1FSDownloadResult>> {
     const res = await this.request('/get_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
