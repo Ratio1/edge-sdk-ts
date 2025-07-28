@@ -1,5 +1,6 @@
 import { BaseClient } from './baseClient'
-import { StatusResponse, UploadResponse, DownloadResponse } from './types'
+import { StatusResponse, DownloadResponse } from './types'
+import { UploadResponse } from './r1fs/types'
 
 export class R1FSClient extends BaseClient {
   async getStatus (): Promise<StatusResponse> {
