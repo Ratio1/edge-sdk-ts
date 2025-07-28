@@ -1,24 +1,29 @@
-// Browser-specific base client that only uses native browser APIs
+import { createDefaultHttpAdapter, type HttpAdapter } from './http/adapter'
+import type { BaseResponse } from './types'
+
 export interface RequestOptions {
   method: 'GET' | 'POST'
   headers?: Record<string, string>
   body?: string | FormData | any
 }
 
-export class BaseClient {
-  constructor (protected readonly baseUrl: string, protected readonly debug = false) {}
+export class BaseHttpClient {
+  constructor (
+    protected readonly baseUrl: string,
+    protected readonly verbose = false,
+    private readonly http: HttpAdapter = createDefaultHttpAdapter()
+  ) {}
 
   protected async request (endpoint: string, options: RequestOptions): Promise<Response> {
     const url = `${this.baseUrl}${endpoint}`
     const start = Date.now()
-    if (this.debug) {
+    if (this.verbose) {
       console.debug('[ratio1-edge-node-client] request', { url, ...options })
     }
 
-    // Use native fetch (always available in browsers)
-    const res = await fetch(url, options)
+    const res = await this.http.fetch(url, options)
     const duration = Date.now() - start
-    if (this.debug) {
+    if (this.verbose) {
       console.debug('[ratio1-edge-node-client] response', { url, status: res.status, duration })
     }
     if (!res.ok) {
@@ -29,6 +34,18 @@ export class BaseClient {
     return res
   }
 
+  protected async parseResponse<T>(res: Response, opts?: { fullResponse?: boolean }): Promise<T | BaseResponse<T>> {
+    let data: BaseResponse<T>
+    try {
+      data = await res.json()
+    } catch (err) {
+      const e = new Error('Failed to parse response')
+      ;(e as any).cause = err
+      throw e
+    }
+    return opts?.fullResponse ? data : data.result
+  }
+
   protected buildQuery (params: Record<string, any>): string {
     const sp = new URLSearchParams()
     for (const [k, v] of Object.entries(params)) {
@@ -36,4 +53,4 @@ export class BaseClient {
     }
     return sp.toString()
   }
-} 
+}

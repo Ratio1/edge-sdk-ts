@@ -61,13 +61,13 @@ export interface SetValueRequest {
   value: ChainStoreValue
 }
 
-export interface HashSetValueRequest {
+export interface HSetRequest {
   hkey: string
   key: string
   value: ChainStoreValue
 }
 
-export interface HashGetValueRequest {
+export interface HGetRequest {
   hkey: string
   key: string
 }

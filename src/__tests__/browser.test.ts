@@ -14,6 +14,12 @@ describe('Browser Client', () => {
 
   it('should handle environment variables correctly', () => {
     // Test that the client can be created without explicit URLs
+    ;(globalThis as any).window = {
+      __RATIO1_ENV__: {
+        CSTORE_API_URL: 'http://localhost:31234',
+        R1FS_API_URL: 'http://localhost:31235'
+      }
+    } as any
     const client = createBrowserClient()
     
     expect(client).toBeDefined()
@@ -22,6 +28,12 @@ describe('Browser Client', () => {
   })
 
   it('should handle Buffer to Blob conversion for file uploads', () => {
+    ;(globalThis as any).window = {
+      __RATIO1_ENV__: {
+        CSTORE_API_URL: 'http://localhost:31234',
+        R1FS_API_URL: 'http://localhost:31235'
+      }
+    } as any
     const client = createBrowserClient()
     
     // Create a mock FormData with Buffer (simulating test environment)

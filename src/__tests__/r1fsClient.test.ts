@@ -1,9 +1,10 @@
 import nock from 'nock'
 import createClient from '../index'
+import crossFetch from 'cross-fetch'
 
 describe('R1FSClient', () => {
   const baseUrl = 'http://localhost:31235'
-  const client = createClient({ r1fsUrl: baseUrl })
+  const client = createClient({ r1fsUrl: baseUrl, cstoreUrl: 'http://localhost:31234', httpAdapter: { fetch: crossFetch as any } })
 
   afterEach(() => {
     nock.cleanAll()
@@ -12,17 +13,17 @@ describe('R1FSClient', () => {
   it('getStatus calls /get_status', async () => {
     nock(baseUrl)
       .get('/get_status')
-      .reply(200, { ok: true })
+      .reply(200, { result: { ok: true } })
 
     const res = await client.r1fs.getStatus()
-    expect(res.ok).toBe(true)
+    expect((res as any).ok).toBe(true)
   })
 
   it('addFile uploads data with correct structure', async () => {
     // Mock the server response
     nock(baseUrl)
       .post('/add_file')
-      .reply(200, { success: true, cid: 'test-cid-123' })
+      .reply(200, { result: { cid: 'test-cid-123', message: 'ok' } })
 
     // Create a mock FormData-like object for testing
     const mockFormData = {
@@ -41,7 +42,6 @@ describe('R1FSClient', () => {
     };
 
     const res = await client.r1fs.addFile({ formData: mockFormData as any })
-    expect(res.success).toBe(true)
-    expect(res.cid).toBe('test-cid-123')
+    expect((res as any).cid).toBe('test-cid-123')
   })
 })

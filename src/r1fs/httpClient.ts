@@ -1,41 +1,42 @@
-import { BaseClient } from '../baseClient'
+import { BaseHttpClient } from '../common/baseHttpClient'
+import type { HttpAdapter } from '../common/http/adapter'
 import {
   type R1FSStatusResult,
   type R1FSUploadResult,
   type R1FSDownloadResult,
-  type R1FSBaseResponse,
+  type R1FSStatusResponse,
+  type R1FSUploadResponse,
+  type R1FSDownloadResponse,
   type UploadFileRequest,
   type UploadBase64Request,
   type DownloadFileRequest,
   type UploadMetadata
 } from './types'
+import { getFormData } from '../common/platform'
 
-// Use native FormData in browsers, fall back to form-data package in Node.js
-let FormDataImpl: typeof FormData
-
-if (typeof globalThis !== 'undefined' && globalThis.FormData) {
-  // Use native FormData if available (browser environments)
-  FormDataImpl = globalThis.FormData
-} else {
-  // Fall back to form-data package for Node.js environments
-  const formDataPackage = require('form-data')
-  FormDataImpl = formDataPackage.default || formDataPackage
-}
-
-export class R1FSClient extends BaseClient {
-  async getStatus (): Promise<R1FSBaseResponse<R1FSStatusResult>> {
-    const res = await this.request('/get_status', { method: 'GET' })
-    return await res.json()
+export class R1FSHttpClient extends BaseHttpClient {
+  constructor (
+    baseUrl: string,
+    verbose = false,
+    adapter?: HttpAdapter,
+    private readonly formDataCtor: typeof FormData = getFormData()
+  ) {
+    super(baseUrl, verbose, adapter)
   }
 
-  async addFile ({ formData }: UploadFileRequest): Promise<R1FSBaseResponse<R1FSUploadResult>> {
+  async getStatus (opts?: { fullResponse?: boolean }): Promise<R1FSStatusResult | R1FSStatusResponse> {
+    const res = await this.request('/get_status', { method: 'GET' })
+    return await this.parseResponse<R1FSStatusResult>(res, opts)
+  }
+
+  async addFile ({ formData }: UploadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSUploadResult | R1FSUploadResponse> {
     // Extract metadata from the original FormData
     const file = formData.get('file') as File | Buffer;
     const filename = formData.get('filename') as string;
     const secret = formData.get('secret') as string;
 
     // Create a new FormData with the correct structure
-    const uploadFormData = new FormDataImpl();
+    const uploadFormData = new this.formDataCtor()
 
     // Handle file upload based on environment and file type
     if (typeof globalThis !== 'undefined' && globalThis.FormData) {
@@ -71,17 +72,16 @@ export class R1FSClient extends BaseClient {
     uploadFormData.append('body', JSON.stringify(bodyData));
 
     const res = await this.request('/add_file', { method: 'POST', body: uploadFormData })
-    const responseData = await res.json()
-    return responseData
+    return await this.parseResponse<R1FSUploadResult>(res, opts)
   }
 
-  async addFileBase64 (data: UploadBase64Request): Promise<R1FSBaseResponse<R1FSUploadResult>> {
+  async addFileBase64 (data: UploadBase64Request, opts?: { fullResponse?: boolean }): Promise<R1FSUploadResult | R1FSUploadResponse> {
     const res = await this.request('/add_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    return await res.json()
+    return await this.parseResponse<R1FSUploadResult>(res, opts)
   }
 
   async getFile ({ cid, secret }: DownloadFileRequest): Promise<Response> {
@@ -90,12 +90,12 @@ export class R1FSClient extends BaseClient {
     return response
   }
 
-  async getFileBase64 ({ cid, secret }: DownloadFileRequest): Promise<R1FSBaseResponse<R1FSDownloadResult>> {
+  async getFileBase64 ({ cid, secret }: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
     const res = await this.request('/get_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cid, secret })
     })
-    return await res.json()
+    return await this.parseResponse<R1FSDownloadResult>(res, opts)
   }
 }
