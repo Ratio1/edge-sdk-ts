@@ -1,16 +1,4 @@
-// Use native fetch when available, fall back to cross-fetch for broader compatibility
-let fetchImpl: typeof fetch
-
-if (typeof globalThis !== 'undefined' && globalThis.fetch) {
-  // Use native fetch if available (browser environments)
-  fetchImpl = globalThis.fetch
-} else {
-  // Fall back to cross-fetch for Node.js environments
-  // Use dynamic import to avoid bundling in browser environments
-  const crossFetch = require('cross-fetch')
-  fetchImpl = crossFetch.default || crossFetch
-}
-
+// Browser-specific base client that only uses native browser APIs
 export interface RequestOptions {
   method: 'GET' | 'POST'
   headers?: Record<string, string>
@@ -27,7 +15,8 @@ export class BaseClient {
       console.debug('[ratio1-edge-node-client] request', { url, ...options })
     }
 
-    const res = await fetchImpl(url, options)
+    // Use native fetch (always available in browsers)
+    const res = await fetch(url, options)
     const duration = Date.now() - start
     if (this.debug) {
       console.debug('[ratio1-edge-node-client] response', { url, status: res.status, duration })
@@ -47,4 +36,4 @@ export class BaseClient {
     }
     return sp.toString()
   }
-}
+} 

@@ -1,14 +1,30 @@
 {
   "name": "ratio1-edge-node-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK for interacting with Ratio1 edge node services (CStore and R1FS)",
   "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "browser": "dist/esm/browser.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./dist/esm/browser.js",
+      "require": "./dist/browser.js",
+      "types": "./dist/browser.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --project tsconfig.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
     "test": "jest",
     "lint": "eslint src --ext .ts",
     "test:e2e:r1fs": "jest src/__tests__/e2e.r1fs.test.ts",
@@ -25,6 +41,9 @@
   "dependencies": {
     "cross-fetch": "^4.0.0"
   },
+  "optionalDependencies": {
+    "form-data": "^4.0.4"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.3",
     "@types/node": "^20.11.19",
@@ -40,5 +59,10 @@
     "nock": "^13.4.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.4.5"
-  }
+  },
+  "browser": {
+    "cross-fetch": false,
+    "form-data": false
+  },
+  "sideEffects": false
 }

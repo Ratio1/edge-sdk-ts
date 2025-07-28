@@ -1,25 +1,13 @@
-import { BaseClient } from '../baseClient'
+import { BaseClient } from './baseClient'
 import {
-  StatusResponse,
-  UploadFileRequest,
-  UploadBase64Request,
-  UploadResponse,
-  DownloadFileRequest,
-  DownloadResponse,
-  UploadMetadata
-} from './types'
-
-// Use native FormData in browsers, fall back to form-data package in Node.js
-let FormDataImpl: typeof FormData
-
-if (typeof globalThis !== 'undefined' && globalThis.FormData) {
-  // Use native FormData if available (browser environments)
-  FormDataImpl = globalThis.FormData
-} else {
-  // Fall back to form-data package for Node.js environments
-  const formDataPackage = require('form-data')
-  FormDataImpl = formDataPackage.default || formDataPackage
-}
+  type StatusResponse,
+  type UploadFileRequest,
+  type UploadBase64Request,
+  type UploadResponse,
+  type DownloadFileRequest,
+  type DownloadResponse,
+  type UploadMetadata
+} from '../r1fs/types'
 
 export class R1FSClient extends BaseClient {
   async getStatus (): Promise<StatusResponse> {
@@ -32,40 +20,28 @@ export class R1FSClient extends BaseClient {
     const file = formData.get('file') as File | Buffer;
     const filename = formData.get('filename') as string;
     const secret = formData.get('secret') as string;
-    
-    // Create a new FormData with the correct structure
-    const uploadFormData = new FormDataImpl();
-    
-    // Handle file upload based on environment and file type
-    if (typeof globalThis !== 'undefined' && globalThis.FormData) {
-      // Browser environment - use native FormData
-      if (file instanceof Blob || file instanceof File) {
-        // Native browser File/Blob
-        uploadFormData.append('file', file);
-      } else if (file instanceof Buffer) {
-        // Convert Buffer to Blob for browser FormData
-        const blob = new Blob([file], { type: 'application/octet-stream' });
-        uploadFormData.append('file', blob, filename || 'file');
-      } else {
-        // Fallback for other cases
-        uploadFormData.append('file', file as any);
-      }
+
+    // Create a new FormData with the correct structure (browser native)
+    const uploadFormData = new FormData();
+
+    // Handle file upload - convert Buffer to Blob if needed
+    if (file instanceof Blob || file instanceof File) {
+      // Native browser File/Blob
+      uploadFormData.append('file', file);
+    } else if (file instanceof Buffer) {
+      // Convert Buffer to Blob for browser FormData
+      const blob = new Blob([file], { type: 'application/octet-stream' });
+      uploadFormData.append('file', blob, filename || 'file');
     } else {
-      // Node.js environment - use form-data package
-      if (file instanceof Buffer) {
-        // Node.js Buffer
-        (uploadFormData as any).append('file', file, { filename: filename || 'file' });
-      } else {
-        // Fallback for other cases
-        (uploadFormData as any).append('file', file, { filename: filename || 'file' });
-      }
+      // Fallback for other cases
+      uploadFormData.append('file', file as any);
     }
-    
+
     // Create body object with metadata and stringify it
     const bodyData: UploadMetadata = {};
     if (filename) bodyData.filename = filename;
     if (secret) bodyData.secret = secret;
-    
+
     // Add the stringified body as a separate field
     uploadFormData.append('body', JSON.stringify(bodyData));
 

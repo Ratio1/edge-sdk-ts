@@ -1,5 +1,6 @@
-import { CStoreClient } from './cstore/client'
-import { R1FSClient } from './r1fs/client'
+// Browser-specific entry point for Next.js SSR compatibility
+import { CStoreClient } from './browser/cstoreClient'
+import { R1FSClient } from './browser/r1fsClient'
 
 export interface Ratio1EdgeNodeClientOptions {
   cstoreUrl?: string
@@ -15,14 +16,7 @@ function getEnvVar(key: string, defaultValue: string): string {
     if (window.__RATIO1_ENV__ && window.__RATIO1_ENV__[key]) {
       return window.__RATIO1_ENV__[key]
     }
-    return defaultValue
   }
-  
-  // In Node.js environment
-  if (typeof process !== 'undefined' && process.env) {
-    return process.env[key] ?? defaultValue
-  }
-  
   return defaultValue
 }
 
@@ -40,10 +34,12 @@ export class Ratio1EdgeNodeClient {
   }
 }
 
-export default function createClient (opts?: Ratio1EdgeNodeClientOptions): Ratio1EdgeNodeClient {
+// Browser-safe client creation
+export function createBrowserClient(opts?: Ratio1EdgeNodeClientOptions): Ratio1EdgeNodeClient {
   return new Ratio1EdgeNodeClient(opts)
 }
 
+// Export everything from the main module
 export * from './cstore/types'
 export * from './r1fs/types'
 
@@ -52,4 +48,4 @@ declare global {
   interface Window {
     __RATIO1_ENV__?: Record<string, string>
   }
-}
+} 
