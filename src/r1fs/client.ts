@@ -40,14 +40,8 @@ export class R1FSClient extends BaseClient {
     // Add the stringified body as a separate field
     uploadFormData.append('body', JSON.stringify(bodyData));
 
-    console.log('Debug - File type:', typeof file);
-    console.log('Debug - File:', file);
-    console.log('Debug - Body data:', bodyData);
-    console.log('Debug - Body JSON:', JSON.stringify(bodyData));
-
     const res = await this.request('/add_file', { method: 'POST', body: uploadFormData })
     const responseData = await res.json()
-    console.log('Debug - Response:', responseData)
     return responseData
   }
 
@@ -62,7 +56,8 @@ export class R1FSClient extends BaseClient {
 
   async getFile ({ cid, secret }: DownloadFileRequest): Promise<Response> {
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
-    return await this.request(`/get_file?${qs}`, { method: 'GET' })
+    const response = await this.request(`/get_file?${qs}`, { method: 'GET' })
+    return response
   }
 
   async getFileBase64 ({ cid, secret }: DownloadFileRequest): Promise<DownloadResponse> {
