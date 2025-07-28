@@ -60,6 +60,11 @@ export class R1FSClient extends BaseClient {
   }
 
   async getFile ({ cid, secret }: DownloadFileRequest): Promise<Response> {
+    // Validate that cid is provided
+    if (!cid) {
+      throw new Error('cid is required for getFile operation')
+    }
+    
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
     const response = await this.request(`/get_file?${qs}`, { method: 'GET' })
     return response
