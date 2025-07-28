@@ -19,7 +19,7 @@ export interface CStoreHSetResponse extends CStoreBaseResponse<boolean> {
 export interface CStoreHGetResponse extends CStoreBaseResponse<string> {
 }
 
-export interface CStoreHGetAllResponse extends CStoreBaseResponse<Record<string, any>> {
+export interface CStoreHGetAllResponse extends CStoreBaseResponse<{ keys: string[] }> {
 }
 
 // Value types for chain store operations
