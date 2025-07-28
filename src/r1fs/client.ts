@@ -1,11 +1,13 @@
 import { BaseClient } from '../baseClient'
+import FormData from 'form-data'
 import {
   StatusResponse,
   UploadFileRequest,
   UploadBase64Request,
   UploadResponse,
   DownloadFileRequest,
-  DownloadResponse
+  DownloadResponse,
+  UploadMetadata
 } from './types'
 
 export class R1FSClient extends BaseClient {
@@ -15,8 +17,38 @@ export class R1FSClient extends BaseClient {
   }
 
   async addFile ({ formData }: UploadFileRequest): Promise<UploadResponse> {
-    const res = await this.request('/add_file', { method: 'POST', body: formData })
-    return await res.json()
+    // Extract metadata from the original FormData
+    const file = formData.get('file') as File | Buffer;
+    const filename = formData.get('filename') as string;
+    const secret = formData.get('secret') as string;
+    
+    // Create a new FormData with the correct structure
+    const uploadFormData = new FormData();
+    
+    // Add the file as a proper file upload with filename
+    if (file instanceof Buffer) {
+      uploadFormData.append('file', file, { filename: filename || 'file' });
+    } else {
+      uploadFormData.append('file', file as any);
+    }
+    
+    // Create body object with metadata and stringify it
+    const bodyData: UploadMetadata = {};
+    if (filename) bodyData.filename = filename;
+    if (secret) bodyData.secret = secret;
+    
+    // Add the stringified body as a separate field
+    uploadFormData.append('body', JSON.stringify(bodyData));
+
+    console.log('Debug - File type:', typeof file);
+    console.log('Debug - File:', file);
+    console.log('Debug - Body data:', bodyData);
+    console.log('Debug - Body JSON:', JSON.stringify(bodyData));
+
+    const res = await this.request('/add_file', { method: 'POST', body: uploadFormData })
+    const responseData = await res.json()
+    console.log('Debug - Response:', responseData)
+    return responseData
   }
 
   async addFileBase64 (data: UploadBase64Request): Promise<UploadResponse> {

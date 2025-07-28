@@ -1,3 +1,6 @@
+import { BaseResponse } from './common/types'
+
+// Legacy interfaces - keeping for backward compatibility
 export interface CStoreBaseResponse {
   server_alias: string
   server_version: string
@@ -26,14 +29,11 @@ export interface StatusResponse {
   EE_ID?: string
 }
 
-export interface UploadResponse {
-  success: boolean
-  message?: string
-  cid?: string
-}
-
 export interface DownloadResponse {
   file?: any
   file_base64_str?: string
   filename: string
 }
+
+// Re-export BaseResponse for convenience
+export { BaseResponse }

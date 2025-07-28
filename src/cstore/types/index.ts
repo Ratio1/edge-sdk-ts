@@ -1,15 +1,6 @@
-// Base response structure with proper typing
-export interface CStoreBaseResponse<T = unknown> {
-  result: T
-  server_node_addr: string
-  evm_network: string
-  ee_node_alias: string
-  ee_node_address: string
-  ee_node_eth_address: string
-  ee_node_network: string
-  ee_node_ver: string
-  [key: string]: any
-}
+import { BaseResponse } from '../../common/types'
+
+export interface CStoreBaseResponse<T = unknown> extends BaseResponse<T> {}
 
 // Specific response types with proper result typing
 export interface CStoreStatusResponse extends CStoreBaseResponse<boolean> {
