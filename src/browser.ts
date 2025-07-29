@@ -48,8 +48,10 @@ export class Ratio1EdgeNodeClient {
       console.warn('Failed to parse chainstorePeers, using empty array', e)
     }
 
-    const cstoreHttp = new CStoreHttpClient(cstoreUrl, verbose, adapter)
-    const r1fsHttp = new R1FSHttpClient(r1fsUrl, verbose, adapter, formDataCtor)
+    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeers)
+
+    const cstoreHttp = new CStoreHttpClient(cstoreUrl, verbose, adapter, chainstorePeers)
+    const r1fsHttp = new R1FSHttpClient(r1fsUrl, verbose, adapter, formDataCtor, chainstorePeers)
 
     this.cstore = new CStoreService(cstoreHttp)
     this.r1fs = new R1FSService(r1fsHttp)
