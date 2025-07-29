@@ -37,10 +37,7 @@ Both produce the same API surface so you can share code between environments.
 ```typescript
 import createRatio1EdgeNodeClient from 'edge-node-client'
 
-const ratio1 = createRatio1EdgeNodeClient({
-  cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
-  r1fsUrl: process.env.EE_R1FS_API_URL
-})
+const ratio1 = createRatio1EdgeNodeClient()
 
 // Store a value (values must be stringified JSON)
 await ratio1.cstore.setValue({ 
@@ -60,10 +57,7 @@ console.log(JSON.parse(result.result)) // { theme: 'dark', language: 'en' }
 ```typescript
 import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
 
-const ratio1 = createRatio1EdgeNodeBrowserClient({
-  cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
-  r1fsUrl: process.env.EE_R1FS_API_URL
-})
+const ratio1 = createRatio1EdgeNodeBrowserClient()
 
 // Use the same API as Node.js
 const status = await ratio1.cstore.getStatus()
@@ -94,29 +88,12 @@ export EE_R1FS_API_URL=http://localhost:31235
 
 ### Next.js Configuration
 
-Create a `.env.local` file:
-
-```env
-# For client-side usage (must be prefixed with NEXT_PUBLIC_)
-# Note: In production, these are automatically injected by the Edge Node container
-NEXT_PUBLIC_EE_CHAINSTORE_API_URL=http://localhost:31234
-NEXT_PUBLIC_EE_R1FS_API_URL=http://localhost:31235
-
-# For server-side usage
-# Note: In production, these are automatically injected by the Edge Node container
-EE_CHAINSTORE_API_URL=http://localhost:31234
-EE_R1FS_API_URL=http://localhost:31235
-```
-
-Then use in your application:
+Run in your application:
 
 ```typescript
 import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
 
-const ratio1 = createRatio1EdgeNodeBrowserClient({
-  cstoreUrl: process.env.NEXT_PUBLIC_EE_CHAINSTORE_API_URL,
-  r1fsUrl: process.env.NEXT_PUBLIC_EE_R1FS_API_URL
-})
+const ratio1 = createRatio1EdgeNodeBrowserClient()
 ```
 
 ## API Reference
@@ -386,10 +363,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const ratio1 = createRatio1EdgeNodeClient({
-    cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
-    r1fsUrl: process.env.EE_R1FS_API_URL
-  })
+  const ratio1 = createRatio1EdgeNodeClient()
 
   try {
     // Store metadata (must be stringified)
@@ -420,10 +394,7 @@ export function FileUpload() {
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
 
-  const ratio1 = createBrowserClient({
-    cstoreUrl: process.env.NEXT_PUBLIC_EE_CHAINSTORE_API_URL,
-    r1fsUrl: process.env.NEXT_PUBLIC_EE_R1FS_API_URL
-  })
+  const ratio1 = createBrowserClient()
 
   const handleUpload = async (files: FileList) => {
     setUploading(true)
