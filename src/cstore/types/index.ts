@@ -7,24 +7,16 @@ export interface CStoreStatusResult {
   keys: string[]
 }
 
-export interface CStoreGetResult {
-  value: string
-}
+export type CStoreGetResult = string
 
-export interface CStoreSetResult {
-  success: boolean
-}
+export type CStoreSetResult = boolean
 
-export interface CStoreHSetResult {
-  success: boolean
-}
+export type CStoreHSetResult = boolean
 
-export interface CStoreHGetResult {
-  value: string
-}
+export type CStoreHGetResult = string
 
 export interface CStoreHGetAllResult {
-  keys: string[]
+  [key: string]: string
 }
 
 // Specific response types with proper result typing
