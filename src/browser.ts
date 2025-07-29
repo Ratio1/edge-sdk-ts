@@ -30,8 +30,8 @@ export class Ratio1EdgeNodeClient {
   readonly r1fs: R1FSService
 
   constructor (opts: Ratio1EdgeNodeClientOptions = {}) {
-    let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost: 31234'
-    let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost: 31235'
+    let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
+    let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
     cstoreUrl = ensureProtocol(cstoreUrl)
     r1fsUrl = ensureProtocol(r1fsUrl)
     const verbose = opts.verbose ?? opts.debug ?? false

@@ -1,6 +1,6 @@
 {
   "name": "edge-node-client",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "SDK for interacting with Ratio1 edge node services (CStore and R1FS)",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
