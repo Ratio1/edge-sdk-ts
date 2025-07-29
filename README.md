@@ -14,12 +14,21 @@ A comprehensive SDK for interacting with Ratio1 Edge Node services including **C
 - 🌐 **Environment Configuration**: Flexible configuration via environment variables or direct options
 - 🛡️ **Error Handling**: Comprehensive error handling with detailed error messages
 - 📁 **File Operations**: Complete file upload/download capabilities with base64 support
+- 🔌 **Pluggable HTTP Layer**: Provide custom `fetch` and `FormData` implementations
+- 🌐 **Protocol Flexibility**: URLs without a scheme automatically default to `http://`
 
 ## Installation
 
 ```bash
 npm install ratio1-edge-node-client
 ```
+
+The SDK exports two factory functions:
+
+- `createClient` for Node.js environments
+- `createBrowserClient` for browsers or frameworks like Next.js
+
+Both produce the same API surface so you can share code between environments.
 
 ## Quick Start
 
@@ -59,6 +68,18 @@ const client = createBrowserClient({
 // Use the same API as Node.js
 const status = await client.cstore.getStatus()
 ```
+
+Both creation functions accept the same options. URLs can omit the protocol; `http://` is added automatically if missing. Use the `verbose` flag to enable debug logging.
+
+```typescript
+const client = createClient({
+  cstoreUrl: 'localhost:31234', // becomes http://localhost:31234
+  r1fsUrl: 'localhost:31235',
+  verbose: true
+})
+```
+
+The SDK also lets you inject a custom `fetch` implementation and `FormData` constructor if needed.
 
 ## Configuration
 
@@ -134,14 +155,14 @@ const result = await client.cstore.getValue({
 
 ```typescript
 // Set a hash field (values must be stringified JSON)
-await client.cstore.hashSetValue({ 
+await client.cstore.hset({ 
   hkey: 'user:123', 
   key: 'name', 
   value: JSON.stringify('John Doe')
 })
 
 // Get a hash field
-const name = await client.cstore.hashGetValue({ 
+const name = await client.cstore.hget({ 
   hkey: 'user:123', 
   key: 'name' 
 })
@@ -178,9 +199,9 @@ await client.cstore.setValue({
 })
 
 // Hash operations for user data (values must be stringified)
-await client.cstore.hashSetValue({ hkey: 'user:123', key: 'name', value: JSON.stringify('John') })
-await client.cstore.hashSetValue({ hkey: 'user:123', key: 'email', value: JSON.stringify('john@example.com') })
-await client.cstore.hashSetValue({ hkey: 'user:123', key: 'age', value: JSON.stringify(30) })
+await client.cstore.hset({ hkey: 'user:123', key: 'name', value: JSON.stringify('John') })
+await client.cstore.hset({ hkey: 'user:123', key: 'email', value: JSON.stringify('john@example.com') })
+await client.cstore.hset({ hkey: 'user:123', key: 'age', value: JSON.stringify(30) })
 
 // Retrieve all user data
 const userData = await client.cstore.hgetall({ hkey: 'user:123' })
