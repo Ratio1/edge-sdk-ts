@@ -9,6 +9,7 @@ import { ensureProtocol } from './helpers'
 export interface Ratio1EdgeNodeClientOptions {
   cstoreUrl?: string
   r1fsUrl?: string
+  chainstorePeers?: string[]
   debug?: boolean
   verbose?: boolean
   httpAdapter?: HttpAdapter
@@ -32,12 +33,20 @@ export class Ratio1EdgeNodeClient {
   constructor (opts: Ratio1EdgeNodeClientOptions = {}) {
     let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
     let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
+    const chainstorePeersStr = opts.chainstorePeers ?? getEnvVar(['EE_CHAINSTORE_PEERS']) ?? []
     cstoreUrl = ensureProtocol(cstoreUrl)
     r1fsUrl = ensureProtocol(r1fsUrl)
     const verbose = opts.verbose ?? opts.debug ?? false
 
     const adapter = opts.httpAdapter
     const formDataCtor = opts.formDataCtor
+
+    let chainstorePeers: string[] = []
+    try {
+      chainstorePeers = Array.isArray(chainstorePeersStr) ? chainstorePeersStr : JSON.parse(chainstorePeersStr)
+    } catch (e) {
+      console.warn('Failed to parse chainstorePeers, using empty array', e)
+    }
 
     const cstoreHttp = new CStoreHttpClient(cstoreUrl, verbose, adapter)
     const r1fsHttp = new R1FSHttpClient(r1fsUrl, verbose, adapter, formDataCtor)

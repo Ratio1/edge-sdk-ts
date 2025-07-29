@@ -20,7 +20,7 @@ describe('r1fs e2e', () => {
     it('add_file uploads data', async () => {
         const formData = new FormData()
         formData.append('file', new Blob([fileContent]), 'mock.txt')
-        const res = await ratio1.r1fs.addFile({ formData })
+        const res = await ratio1.r1fs.addFile({ formData }, {fullResponse: true})
         expect(res.cid).toBeDefined()
         cidFile = res.cid!
     })
