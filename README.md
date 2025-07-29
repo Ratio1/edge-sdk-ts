@@ -1,8 +1,8 @@
-# ratio1-edge-node-client
+# edge-node-client
 
 A comprehensive SDK for interacting with Ratio1 Edge Node services including **CStore** (distributed key-value store) and **R1FS** (distributed file system).
 
-[![npm version](https://badge.fury.io/js/ratio1-edge-node-client.svg)](https://badge.fury.io/js/ratio1-edge-node-client)
+[![npm version](https://badge.fury.io/js/edge-node-client.svg)](https://badge.fury.io/js/edge-node-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -20,13 +20,13 @@ A comprehensive SDK for interacting with Ratio1 Edge Node services including **C
 ## Installation
 
 ```bash
-npm install ratio1-edge-node-client
+npm install edge-node-client
 ```
 
 The SDK exports two factory functions:
 
-- `createClient` for Node.js environments
-- `createBrowserClient` for browsers or frameworks like Next.js
+- `createRatio1EdgeNodeClient` for Node.js environments
+- `createRatio1EdgeNodeBrowserClient` for browsers or frameworks like Next.js
 
 Both produce the same API surface so you can share code between environments.
 
@@ -35,21 +35,21 @@ Both produce the same API surface so you can share code between environments.
 ### Node.js Environment
 
 ```typescript
-import createClient from 'ratio1-edge-node-client'
+import createRatio1EdgeNodeClient from 'edge-node-client'
 
-const client = createClient({
+const ratio1 = createRatio1EdgeNodeClient({
   cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
   r1fsUrl: process.env.EE_R1FS_API_URL
 })
 
 // Store a value (values must be stringified JSON)
-await client.cstore.setValue({ 
+await ratio1.cstore.setValue({ 
   key: 'user:123:preferences', 
   value: JSON.stringify({ theme: 'dark', language: 'en' })
 })
 
 // Retrieve the value
-const result = await client.cstore.getValue({ 
+const result = await ratio1.cstore.getValue({ 
   key: 'user:123:preferences' 
 })
 console.log(JSON.parse(result.result)) // { theme: 'dark', language: 'en' }
@@ -58,23 +58,21 @@ console.log(JSON.parse(result.result)) // { theme: 'dark', language: 'en' }
 ### Browser Environment (Next.js, React, etc.)
 
 ```typescript
-import { createBrowserClient } from 'ratio1-edge-node-client/browser'
+import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
 
-const client = createBrowserClient({
+const ratio1 = createRatio1EdgeNodeBrowserClient({
   cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
   r1fsUrl: process.env.EE_R1FS_API_URL
 })
 
 // Use the same API as Node.js
-const status = await client.cstore.getStatus()
+const status = await ratio1.cstore.getStatus()
 ```
 
-Both creation functions accept the same options. URLs can omit the protocol; `http://` is added automatically if missing. Use the `verbose` flag to enable debug logging.
+Both creation functions accept the same options. Use the `verbose` flag to enable debug logging.
 
 ```typescript
-const client = createClient({
-  cstoreUrl: 'localhost:31234', // becomes http://localhost:31234
-  r1fsUrl: 'localhost:31235',
+const ratio1 = createRatio1EdgeNodeClient({
   verbose: true
 })
 ```
@@ -113,9 +111,9 @@ EE_R1FS_API_URL=http://localhost:31235
 Then use in your application:
 
 ```typescript
-import { createBrowserClient } from 'ratio1-edge-node-client/browser'
+import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
 
-const client = createBrowserClient({
+const ratio1 = createRatio1EdgeNodeBrowserClient({
   cstoreUrl: process.env.NEXT_PUBLIC_EE_CHAINSTORE_API_URL,
   r1fsUrl: process.env.NEXT_PUBLIC_EE_R1FS_API_URL
 })
@@ -133,18 +131,18 @@ CStore provides a distributed key-value store with hash operations.
 
 ```typescript
 // Get service status
-const status = await client.cstore.getStatus()
+const status = await ratio1.cstore.getStatus()
 // Returns: { success: true, result: true, keys?: string[] }
 
 // Set a value (values must be stringified JSON)
-await client.cstore.setValue({ 
+await ratio1.cstore.setValue({ 
   key: 'my-key', 
   value: JSON.stringify('my-value')
 })
 // Returns: { success: true, result: true }
 
 // Get a value
-const result = await client.cstore.getValue({ 
+const result = await ratio1.cstore.getValue({ 
   key: 'my-key' 
 })
 // Returns: { success: true, result: '"my-value"' }
@@ -155,14 +153,14 @@ const result = await client.cstore.getValue({
 
 ```typescript
 // Set a hash field (values must be stringified JSON)
-await client.cstore.hset({ 
+await ratio1.cstore.hset({ 
   hkey: 'user:123', 
   key: 'name', 
   value: JSON.stringify('John Doe')
 })
 
 // Get a hash field
-const name = await client.cstore.hget({ 
+const name = await ratio1.cstore.hget({ 
   hkey: 'user:123', 
   key: 'name' 
 })
@@ -170,7 +168,7 @@ const name = await client.cstore.hget({
 // Note: result is a JSON string, parse it to get the actual value
 
 // Get all hash fields
-const allFields = await client.cstore.hgetall({ 
+const allFields = await ratio1.cstore.hgetall({ 
   hkey: 'user:123' 
 })
 // Returns: { success: true, result: { keys: ['name', 'email', 'age'] } }
@@ -180,7 +178,7 @@ const allFields = await client.cstore.hgetall({
 
 ```typescript
 // Store complex objects (must be stringified)
-await client.cstore.setValue({
+await ratio1.cstore.setValue({
   key: 'user:123:profile',
   value: JSON.stringify({
     name: 'John Doe',
@@ -193,18 +191,18 @@ await client.cstore.setValue({
 })
 
 // Store arrays (must be stringified)
-await client.cstore.setValue({
+await ratio1.cstore.setValue({
   key: 'user:123:posts',
   value: JSON.stringify(['post1', 'post2', 'post3'])
 })
 
 // Hash operations for user data (values must be stringified)
-await client.cstore.hset({ hkey: 'user:123', key: 'name', value: JSON.stringify('John') })
-await client.cstore.hset({ hkey: 'user:123', key: 'email', value: JSON.stringify('john@example.com') })
-await client.cstore.hset({ hkey: 'user:123', key: 'age', value: JSON.stringify(30) })
+await ratio1.cstore.hset({ hkey: 'user:123', key: 'name', value: JSON.stringify('John') })
+await ratio1.cstore.hset({ hkey: 'user:123', key: 'email', value: JSON.stringify('john@example.com') })
+await ratio1.cstore.hset({ hkey: 'user:123', key: 'age', value: JSON.stringify(30) })
 
 // Retrieve all user data
-const userData = await client.cstore.hgetall({ hkey: 'user:123' })
+const userData = await ratio1.cstore.hgetall({ hkey: 'user:123' })
 ```
 
 ### R1FS Client
@@ -223,12 +221,12 @@ formData.append('file', file)
 formData.append('filename', file.name)
 formData.append('secret', 'optional-secret-key')
 
-const uploadResult = await client.r1fs.addFile({ formData })
+const uploadResult = await ratio1.r1fs.addFile({ formData })
 // Returns: { success: true, result: { message: 'File uploaded', cid: 'QmHash...' } }
 
 // Upload using base64 (works in both Node.js and browser)
 const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'
-const uploadResult = await client.r1fs.addFileBase64({
+const uploadResult = await ratio1.r1fs.addFileBase64({
   file_base64_str: base64Data,
   filename: 'image.png',
   secret: 'optional-secret-key'
@@ -239,7 +237,7 @@ const uploadResult = await client.r1fs.addFileBase64({
 
 ```typescript
 // Download file as blob/response
-const fileResponse = await client.r1fs.getFile({ 
+const fileResponse = await ratio1.r1fs.getFile({ 
   cid: 'QmHash...',
   secret: 'optional-secret-key' // if file was uploaded with secret
 })
@@ -253,7 +251,7 @@ a.download = 'filename.ext'
 a.click()
 
 // Download as base64
-const base64Result = await client.r1fs.getFileBase64({ 
+const base64Result = await ratio1.r1fs.getFileBase64({ 
   cid: 'QmHash...',
   secret: 'optional-secret-key'
 })
@@ -264,7 +262,7 @@ const base64Result = await client.r1fs.getFileBase64({
 
 ```typescript
 // Check R1FS service status
-const status = await client.r1fs.getStatus()
+const status = await ratio1.r1fs.getStatus()
 // Returns: { EE_ID: 'edge-node-id', ... }
 ```
 
@@ -278,7 +276,7 @@ async function uploadFiles(files: File[]) {
     formData.append('file', file)
     formData.append('filename', file.name)
     
-    return await client.r1fs.addFile({ formData })
+    return await ratio1.r1fs.addFile({ formData })
   })
   
   const results = await Promise.all(uploadPromises)
@@ -287,7 +285,7 @@ async function uploadFiles(files: File[]) {
 
 // Download and display image
 async function displayImage(cid: string) {
-  const response = await client.r1fs.getFile({ cid })
+  const response = await ratio1.r1fs.getFile({ cid })
   const blob = await response.blob()
   const url = URL.createObjectURL(blob)
   
@@ -303,7 +301,7 @@ The SDK provides comprehensive error handling:
 
 ```typescript
 try {
-  const result = await client.cstore.getValue({ key: 'non-existent-key' })
+  const result = await ratio1.cstore.getValue({ key: 'non-existent-key' })
   console.log(result.result)
 } catch (error) {
   if (error.message.includes('404')) {
@@ -331,10 +329,10 @@ The package is marked as `sideEffects: false`, enabling optimal tree shaking:
 
 ```typescript
 // Only CStore functionality will be included
-import { CStoreClient } from 'ratio1-edge-node-client'
+import { CStoreClient } from 'edge-node-client'
 
 // Only R1FS functionality will be included  
-import { R1FSClient } from 'ratio1-edge-node-client'
+import { R1FSClient } from 'edge-node-client'
 ```
 
 ## Development
@@ -344,7 +342,7 @@ import { R1FSClient } from 'ratio1-edge-node-client'
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ratio1-edge-node-client
+cd edge-node-client
 
 # Install dependencies
 npm install
@@ -381,21 +379,21 @@ npm run test:e2e:r1fs
 
 ```typescript
 // pages/api/upload.ts
-import createClient from 'ratio1-edge-node-client'
+import createRatio1EdgeNodeClient from 'edge-node-client'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const client = createClient({
+  const ratio1 = createRatio1EdgeNodeClient({
     cstoreUrl: process.env.EE_CHAINSTORE_API_URL,
     r1fsUrl: process.env.EE_R1FS_API_URL
   })
 
   try {
     // Store metadata (must be stringified)
-await client.cstore.setValue({
+await ratio1.cstore.setValue({
   key: `upload:${Date.now()}`,
   value: JSON.stringify({
     filename: req.body.filename,
@@ -415,14 +413,14 @@ await client.cstore.setValue({
 
 ```typescript
 // components/FileUpload.tsx
-import { createBrowserClient } from 'ratio1-edge-node-client/browser'
+import { createBrowserClient } from 'edge-node-client/browser'
 import { useState } from 'react'
 
 export function FileUpload() {
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
 
-  const client = createBrowserClient({
+  const ratio1 = createBrowserClient({
     cstoreUrl: process.env.NEXT_PUBLIC_EE_CHAINSTORE_API_URL,
     r1fsUrl: process.env.NEXT_PUBLIC_EE_R1FS_API_URL
   })
@@ -436,7 +434,7 @@ export function FileUpload() {
         formData.append('file', file)
         formData.append('filename', file.name)
         
-        const result = await client.r1fs.addFile({ formData })
+        const result = await ratio1.r1fs.addFile({ formData })
         return result.result.cid
       })
       
@@ -495,5 +493,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Support
 
 - 📖 **Documentation**: This README and inline code comments
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/ratio1-edge-node-client/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/ratio1-edge-node-client/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/edge-node-client/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/edge-node-client/discussions)

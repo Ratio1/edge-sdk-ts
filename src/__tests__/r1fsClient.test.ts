@@ -1,10 +1,10 @@
 import nock from 'nock'
-import createClient from '../index'
+import createRatio1EdgeNodeClient from '../index'
 import crossFetch from 'cross-fetch'
 
 describe('R1FSClient', () => {
   const baseUrl = 'http://localhost:31235'
-  const client = createClient({ r1fsUrl: baseUrl, cstoreUrl: 'http://localhost:31234', httpAdapter: { fetch: crossFetch as any } })
+  const client = createRatio1EdgeNodeClient({ r1fsUrl: baseUrl, cstoreUrl: 'http://localhost:31234', httpAdapter: { fetch: crossFetch as any } })
 
   afterEach(() => {
     nock.cleanAll()

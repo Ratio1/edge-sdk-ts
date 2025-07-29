@@ -1,6 +1,6 @@
 {
-  "name": "ratio1-edge-node-client",
-  "version": "0.2.3",
+  "name": "edge-node-client",
+  "version": "0.3.1",
   "description": "SDK for interacting with Ratio1 edge node services (CStore and R1FS)",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
@@ -31,8 +31,8 @@
     "build:esm": "tsc --project tsconfig.esm.json",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "test:e2e:r1fs": "jest src/__tests__/e2e.r1fs.test.ts",
-    "test:e2e:cstore": "jest src/__tests__/e2e.cstore.test.ts"
+    "test:e2e:r1fs": "jest src/__tests__/r1fs.test.ts",
+    "test:e2e:cstore": "jest src/__tests__/cstore.test.ts"
   },
   "keywords": [
     "ratio1",

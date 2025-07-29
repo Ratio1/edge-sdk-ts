@@ -50,7 +50,7 @@ export class Ratio1EdgeNodeClient {
 }
 
 // Browser-safe client creation
-export function createBrowserClient(opts?: Ratio1EdgeNodeClientOptions): Ratio1EdgeNodeClient {
+export function createRatio1EdgeNodeBrowserClient(opts?: Ratio1EdgeNodeClientOptions): Ratio1EdgeNodeClient {
   return new Ratio1EdgeNodeClient(opts)
 }
 
@@ -62,4 +62,4 @@ declare global {
   interface Window {
     __RATIO1_ENV__?: Record<string, string>
   }
-} 
+}

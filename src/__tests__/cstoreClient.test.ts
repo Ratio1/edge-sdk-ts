@@ -1,10 +1,10 @@
 import nock from 'nock'
-import createClient from '../index'
+import createRatio1EdgeNodeClient from '../index'
 import crossFetch from 'cross-fetch'
 
 describe('CStoreClient', () => {
   const baseUrl = 'http://localhost:31234'
-  const client = createClient({ cstoreUrl: baseUrl, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
+  const ratio1 = createRatio1EdgeNodeClient({ cstoreUrl: baseUrl, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
 
   afterEach(() => {
     nock.cleanAll()
@@ -16,7 +16,7 @@ describe('CStoreClient', () => {
       .query({ hkey: 'test' })
       .reply(200, { result: { test: { key: 'value' } } })
 
-    const res = await client.cstore.hgetall({ hkey: 'test' })
+    const res = await ratio1.cstore.hgetall({ hkey: 'test' })
     expect(res).toBeDefined()
   })
 })

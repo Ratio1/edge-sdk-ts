@@ -15,13 +15,16 @@ import {
 import { getFormData } from '../common/platform'
 
 export class R1FSHttpClient extends BaseHttpClient {
+  protected readonly chainstorePeers: string[] = []
   constructor (
     baseUrl: string,
     verbose = false,
     adapter?: HttpAdapter,
-    private readonly formDataCtor: typeof FormData = getFormData()
+    private readonly formDataCtor: typeof FormData = getFormData(),
+    chainstorePeers: string[] = []
   ) {
     super(baseUrl, verbose, adapter)
+    this.chainstorePeers = chainstorePeers
   }
 
   async getStatus (opts?: { fullResponse?: boolean }): Promise<R1FSStatusResult | R1FSStatusResponse> {

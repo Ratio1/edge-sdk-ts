@@ -1,25 +1,25 @@
-// Example: Using ratio1-edge-node-client in a Next.js application
+// Example: Using edge-node-client in a Next.js application
 
 // For client-side usage (in React components)
-import { createBrowserClient } from 'ratio1-edge-node-client/browser'
+import { createRatio1EdgeNodeClient } from 'edge-node-client/browser'
 
 // Example client-side usage
 export async function clientSideExample() {
-  const client = createBrowserClient({
+  const ratio1 = createRatio1EdgeNodeClient({
     cstoreUrl: process.env.NEXT_PUBLIC_CSTORE_API_URL,
     r1fsUrl: process.env.NEXT_PUBLIC_R1FS_API_URL
   })
 
   try {
     // Store a value
-    await client.cstore.setValue({ 
-      key: 'user-preference', 
-      value: 'dark-mode' 
+    await ratio1.cstore.setValue({
+      key: 'user-preference',
+      value: 'dark-mode'
     })
 
     // Retrieve the value
-    const result = await client.cstore.getValue({ 
-      key: 'user-preference' 
+    const result = await ratio1.cstore.getValue({
+      key: 'user-preference'
     })
 
     console.log('Retrieved value:', result.result)
@@ -29,17 +29,17 @@ export async function clientSideExample() {
 }
 
 // For server-side usage (in API routes or getServerSideProps)
-import createClient from 'ratio1-edge-node-client'
+import createRatio1EdgeNodeClient from 'edge-node-client'
 
 export async function getServerSideProps() {
-  const client = createClient({
+  const ratio1 = createRatio1EdgeNodeClient({
     cstoreUrl: process.env.CSTORE_API_URL,
     r1fsUrl: process.env.R1FS_API_URL
   })
 
   try {
-    const status = await client.cstore.getStatus()
-    
+    const status = await ratio1.cstore.getStatus()
+
     return {
       props: {
         status: status
@@ -58,7 +58,7 @@ export async function getServerSideProps() {
 // Example API route
 export default function handler(req: any, res: any) {
   if (req.method === 'POST') {
-    const client = createClient({
+    const ratio1 = createcreateRatio1EdgeNodeClientClient({
       cstoreUrl: process.env.CSTORE_API_URL,
       r1fsUrl: process.env.R1FS_API_URL
     })
@@ -76,4 +76,4 @@ export default function handler(req: any, res: any) {
   } else {
     res.status(405).json({ error: 'Method not allowed' })
   }
-} 
+}
