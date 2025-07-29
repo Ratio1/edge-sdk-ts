@@ -60,6 +60,7 @@ export class Ratio1EdgeNodeClient {
 
     console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
     console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
+    console.log('[edge-node-client] getEnvVar(["EE_CHAINSTORE_PEERS"])', getEnvVar(['EE_CHAINSTORE_PEERS']))
 
     const adapter = opts.httpAdapter
     const formDataCtor = opts.formDataCtor
