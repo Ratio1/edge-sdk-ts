@@ -1,7 +1,7 @@
-// Example: Using edge-node-client in a Next.js application
+// Example: Using @ratio1/edge-node-client in a Next.js application
 
 // For client-side usage (in React components)
-import { createRatio1EdgeNodeClient } from 'edge-node-client/browser'
+import { createRatio1EdgeNodeClient } from '@ratio1/edge-node-client/browser'
 
 // Example client-side usage
 export async function clientSideExample() {
@@ -29,7 +29,7 @@ export async function clientSideExample() {
 }
 
 // For server-side usage (in API routes or getServerSideProps)
-import createRatio1EdgeNodeClient from 'edge-node-client'
+import createRatio1EdgeNodeClient from '@ratio1/edge-node-client'
 
 export async function getServerSideProps() {
   const ratio1 = createRatio1EdgeNodeClient({

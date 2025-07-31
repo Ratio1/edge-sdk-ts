@@ -20,7 +20,7 @@ A comprehensive SDK for interacting with Ratio1 Edge Node services including **C
 ## Installation
 
 ```bash
-npm install edge-node-client
+npm install @ratio1/edge-node-client
 ```
 
 The SDK exports two factory functions:
@@ -35,7 +35,7 @@ Both produce the same API surface so you can share code between environments.
 ### Node.js Environment
 
 ```typescript
-import createRatio1EdgeNodeClient from 'edge-node-client'
+import createRatio1EdgeNodeClient from '@ratio1/edge-node-client'
 
 const ratio1 = createRatio1EdgeNodeClient()
 
@@ -55,7 +55,7 @@ console.log(JSON.parse(result.result)) // { theme: 'dark', language: 'en' }
 ### Browser Environment (Next.js, React, etc.)
 
 ```typescript
-import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
+import { createRatio1EdgeNodeBrowserClient } from '@ratio1/edge-node-client/browser'
 
 const ratio1 = createRatio1EdgeNodeBrowserClient()
 
@@ -91,7 +91,7 @@ export EE_R1FS_API_URL=http://localhost:31235
 Run in your application:
 
 ```typescript
-import { createRatio1EdgeNodeBrowserClient } from 'edge-node-client/browser'
+import { createRatio1EdgeNodeBrowserClient } from '@ratio1/edge-node-client/browser'
 
 const ratio1 = createRatio1EdgeNodeBrowserClient()
 ```
@@ -306,10 +306,10 @@ The package is marked as `sideEffects: false`, enabling optimal tree shaking:
 
 ```typescript
 // Only CStore functionality will be included
-import { CStoreClient } from 'edge-node-client'
+import { CStoreClient } from '@ratio1/edge-node-client'
 
 // Only R1FS functionality will be included  
-import { R1FSClient } from 'edge-node-client'
+import { R1FSClient } from '@ratio1/edge-node-client'
 ```
 
 ## Development
@@ -319,7 +319,7 @@ import { R1FSClient } from 'edge-node-client'
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd edge-node-client
+cd @ratio1/edge-node-client
 
 # Install dependencies
 npm install
@@ -356,7 +356,7 @@ npm run test:e2e:r1fs
 
 ```typescript
 // pages/api/upload.ts
-import createRatio1EdgeNodeClient from 'edge-node-client'
+import createRatio1EdgeNodeClient from '@ratio1/edge-node-client'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -387,7 +387,7 @@ await ratio1.cstore.setValue({
 
 ```typescript
 // components/FileUpload.tsx
-import { createBrowserClient } from 'edge-node-client/browser'
+import { createBrowserClient } from '@ratio1/edge-node-client/browser'
 import { useState } from 'react'
 
 export function FileUpload() {
@@ -464,5 +464,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Support
 
 - 📖 **Documentation**: This README and inline code comments
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/edge-node-client/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/edge-node-client/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/@ratio1/edge-node-client/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/@ratio1/edge-node-client/discussions)

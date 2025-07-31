@@ -38,10 +38,6 @@ export class Ratio1EdgeNodeClient {
     r1fsUrl = ensureProtocol(r1fsUrl)
     const verbose = opts.verbose ?? opts.debug ?? false
 
-    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
-    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
-    console.log('[edge-node-client] getEnvVar(["EE_CHAINSTORE_PEERS"])', getEnvVar(['EE_CHAINSTORE_PEERS']))
-
     const adapter = opts.httpAdapter
     const formDataCtor = opts.formDataCtor
 
