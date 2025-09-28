@@ -10,7 +10,15 @@ import {
   type UploadFileRequest,
   type UploadBase64Request,
   type DownloadFileRequest,
-  type UploadMetadata
+  type UploadMetadata,
+  type StoreYamlRequest,
+  type RetrieveYamlRequest,
+  type R1FSYamlDataResult,
+  type R1FSYamlDataResponse,
+  type StoreJsonRequest,
+  type CalculateCidRequest,
+  type R1FSCidResult,
+  type R1FSCidResponse
 } from './types'
 import { getFormData } from '../common/platform'
 
@@ -37,6 +45,7 @@ export class R1FSHttpClient extends BaseHttpClient {
     const file = formData.get('file') as File | Buffer;
     const filename = formData.get('filename') as string;
     const secret = formData.get('secret') as string;
+    const nonceStr = formData.get('nonce') as string;
 
     // Create a new FormData with the correct structure
     const uploadFormData = new this.formDataCtor()
@@ -49,7 +58,12 @@ export class R1FSHttpClient extends BaseHttpClient {
         uploadFormData.append('file', file);
       } else if (file instanceof Buffer) {
         // Convert Buffer to Blob for browser FormData
-        const blob = new Blob([file], { type: 'application/octet-stream' });
+        const arrayBuffer = file.buffer instanceof ArrayBuffer ? file.buffer : new ArrayBuffer(file.length);
+        if (!(file.buffer instanceof ArrayBuffer)) {
+          const view = new Uint8Array(arrayBuffer);
+          view.set(new Uint8Array(file.buffer, file.byteOffset, file.byteLength));
+        }
+        const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
         uploadFormData.append('file', blob, filename || 'file');
       } else {
         // Fallback for other cases
@@ -70,6 +84,12 @@ export class R1FSHttpClient extends BaseHttpClient {
     const bodyData: UploadMetadata = {};
     if (filename) bodyData.filename = filename;
     if (secret) bodyData.secret = secret;
+    if (nonceStr) {
+      const nonce = parseInt(nonceStr);
+      if (!isNaN(nonce)) {
+        bodyData.nonce = nonce;
+      }
+    }
 
     // Add the stringified body as a separate field
     uploadFormData.append('body', JSON.stringify(bodyData));
@@ -87,10 +107,10 @@ export class R1FSHttpClient extends BaseHttpClient {
     return await this.parseResponse<R1FSUploadResult>(res, opts)
   }
 
-  async getFile ({ cid, secret }: DownloadFileRequest): Promise<Response> {
+  async getFile ({ cid, secret }: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
-    const response = await this.request(`/get_file?${qs}`, { method: 'GET' })
-    return response
+    const res = await this.request(`/get_file?${qs}`, { method: 'GET' })
+    return await this.parseResponse<R1FSDownloadResult>(res, opts)
   }
 
   async getFileBase64 ({ cid, secret }: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
@@ -100,5 +120,38 @@ export class R1FSHttpClient extends BaseHttpClient {
       body: JSON.stringify({ cid, secret })
     })
     return await this.parseResponse<R1FSDownloadResult>(res, opts)
+  }
+
+  async addYaml (data: StoreYamlRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    const res = await this.request('/add_yaml', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return await this.parseResponse<R1FSCidResult>(res, opts)
+  }
+
+  async getYaml ({ cid, secret }: RetrieveYamlRequest, opts?: { fullResponse?: boolean }): Promise<R1FSYamlDataResult | R1FSYamlDataResponse> {
+    const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
+    const res = await this.request(`/get_yaml?${qs}`, { method: 'GET' })
+    return await this.parseResponse<R1FSYamlDataResult>(res, opts)
+  }
+
+  async addJson (data: StoreJsonRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    const res = await this.request('/add_json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return await this.parseResponse<R1FSCidResult>(res, opts)
+  }
+
+  async calculateJsonCid (data: CalculateCidRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    const res = await this.request('/calculate_json_cid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return await this.parseResponse<R1FSCidResult>(res, opts)
   }
 }

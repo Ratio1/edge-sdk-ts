@@ -8,7 +8,15 @@ import type {
   R1FSDownloadResponse,
   UploadFileRequest,
   UploadBase64Request,
-  DownloadFileRequest
+  DownloadFileRequest,
+  StoreYamlRequest,
+  RetrieveYamlRequest,
+  R1FSYamlDataResult,
+  R1FSYamlDataResponse,
+  StoreJsonRequest,
+  CalculateCidRequest,
+  R1FSCidResult,
+  R1FSCidResponse
 } from './types'
 
 export class R1FSService {
@@ -28,13 +36,34 @@ export class R1FSService {
     return this.http.addFileBase64(data, opts)
   }
 
-  getFile(data: DownloadFileRequest): Promise<Response> {
+  getFile(data: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
     if (!data.cid) throw new Error('cid is required')
-    return this.http.getFile(data)
+    return this.http.getFile(data, opts)
   }
 
   getFileBase64(data: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
     if (!data.cid) throw new Error('cid is required')
     return this.http.getFileBase64(data, opts)
+  }
+
+  addYaml(data: StoreYamlRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    return this.http.addYaml(data, opts)
+  }
+
+  getYaml(data: RetrieveYamlRequest, opts?: { fullResponse?: boolean }): Promise<R1FSYamlDataResult | R1FSYamlDataResponse> {
+    if (!data.cid) throw new Error('cid is required')
+    return this.http.getYaml(data, opts)
+  }
+
+  addJson(data: StoreJsonRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    return this.http.addJson(data, opts)
+  }
+
+  calculateJsonCid(data: CalculateCidRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
+    return this.http.calculateJsonCid(data, opts)
   }
 }

@@ -14,9 +14,14 @@ export interface R1FSUploadResult {
 }
 
 export interface R1FSDownloadResult {
-  file?: any
+  file_path?: string
   file_base64_str?: string
-  filename: string
+  filename?: string
+  meta?: {
+    file: string
+    filename: string
+  }
+  file_data?: any
 }
 
 // Specific response types with proper result typing
@@ -30,6 +35,7 @@ export interface R1FSDownloadResponse extends R1FSBaseResponse<R1FSDownloadResul
 export interface UploadMetadata {
   filename?: string
   secret?: string
+  nonce?: number
 }
 
 // Interface for the FormData-like object that addFile expects
@@ -46,9 +52,50 @@ export interface UploadBase64Request {
   file_base64_str: string
   filename?: string
   secret?: string
+  nonce?: number
 }
 
 export interface DownloadFileRequest {
   cid: string
   secret?: string
 }
+
+// YAML operation interfaces
+export interface StoreYamlRequest {
+  data: Record<string, any>
+  fn?: string
+  secret?: string
+  nonce?: number
+}
+
+export interface RetrieveYamlRequest {
+  cid: string
+  secret?: string
+}
+
+export interface R1FSYamlDataResult {
+  file_data: Record<string, any>
+}
+
+export interface R1FSYamlDataResponse extends R1FSBaseResponse<R1FSYamlDataResult> {}
+
+// JSON operation interfaces
+export interface StoreJsonRequest {
+  data: Record<string, any>
+  fn?: string
+  secret?: string
+  nonce?: number
+}
+
+export interface CalculateCidRequest {
+  data: Record<string, any>
+  nonce: number
+  fn?: string
+  secret?: string
+}
+
+export interface R1FSCidResult {
+  cid: string
+}
+
+export interface R1FSCidResponse extends R1FSBaseResponse<R1FSCidResult> {}

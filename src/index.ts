@@ -17,11 +17,7 @@ export interface Ratio1EdgeNodeClientOptions {
 
 // Helper function to get environment variables safely
 function getEnvVar(keys: string[]): string | undefined {
-  console.log('[edge-node-client] Checking window.__RATIO1_ENV__')
-  console.log('[edge-node-client] Environment variables:', keys)
-  console.log('[edge-node-client] Environment window:', window)
-  console.log('[edge-node-client] Environment window:', window.__RATIO1_ENV__)
-
+  // Check browser environment first
   if (typeof window !== 'undefined') {
     if (window.__RATIO1_ENV__) {
       for (const k of keys) {
@@ -31,16 +27,12 @@ function getEnvVar(keys: string[]): string | undefined {
     return undefined
   }
 
-  console.log('[edge-node-client] No window.__RATIO1_ENV__ found, checking process.env')
-  console.log('[edge-node-client] Environment variables:', keys)
-  console.log('[edge-node-client] process')
-  console.log('[edge-node-client] process.env:', process.env)
+  // Check Node.js environment
   if (typeof process !== 'undefined' && process.env) {
     for (const k of keys) {
       const val = process.env[k]
       if (val) return val
     }
-    return undefined
   }
 
   return undefined
@@ -58,9 +50,9 @@ export class Ratio1EdgeNodeClient {
     r1fsUrl = ensureProtocol(r1fsUrl)
     const verbose = opts.verbose ?? opts.debug ?? false
 
-    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
-    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
-    console.log('[edge-node-client] getEnvVar(["EE_CHAINSTORE_PEERS"])', getEnvVar(['EE_CHAINSTORE_PEERS']))
+    if (verbose) {
+      console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeersStr)
+    }
 
     const adapter = opts.httpAdapter
     const formDataCtor = opts.formDataCtor

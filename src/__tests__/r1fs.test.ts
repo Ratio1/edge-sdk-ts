@@ -52,10 +52,10 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .get('/get_file')
       .query({ cid: "QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp", secret: "test-secret" })
-      .reply(200, fileContent)
+      .reply(200, { result: { file_path: "/path/to/file", meta: { file: "/path/to/file", filename: "test.txt" } } })
     const res = await client.r1fs.getFile({ cid: "QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp", secret: "test-secret" })
-    const text = await res.text()
-    expect(text).toBe(fileContent)
+    expect(res.file_path).toBe("/path/to/file")
+    expect(res.meta?.filename).toBe("test.txt")
   })
   //
   // it('add_file_base64 uploads data', async () => {
