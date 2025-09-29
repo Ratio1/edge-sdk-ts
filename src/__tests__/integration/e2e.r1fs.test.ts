@@ -47,4 +47,44 @@ describe('r1fs e2e', () => {
         const res = await ratio1.r1fs.getFileBase64({ cid: cidB64 })
         expect(res.file_base64_str).toBe(baseStr)
     })
+
+    it('add_yaml stores yaml data', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const res = await ratio1.r1fs.addYaml({ data: testData, fn: 'test.yaml', secret: 'test-secret' }, {fullResponse: true}) as any
+        expect(res.result.cid).toBeDefined()
+    })
+
+    it('get_yaml retrieves yaml data', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const addRes = await ratio1.r1fs.addYaml({ data: testData, fn: 'test.yaml' }, {fullResponse: true}) as any
+        expect(addRes.result.cid).toBeDefined()
+        const cid = addRes.result.cid
+        
+        const res = await ratio1.r1fs.getYaml({ cid })
+        expect(res.file_data).toEqual(testData)
+    })
+
+    it('add_json stores json data', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const res = await ratio1.r1fs.addJson({ data: testData, fn: 'test.json', secret: 'test-secret', nonce: 1 }, {fullResponse: true}) as any
+        expect(res.result.cid).toBeDefined()
+    })
+
+    it('add_pickle stores pickle data', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const res = await ratio1.r1fs.addPickle({ data: testData, fn: 'test.pkl', secret: 'test-secret', nonce: 1 }, {fullResponse: true}) as any
+        expect(res.result.cid).toBeDefined()
+    })
+
+    it('calculate_json_cid calculates cid without storing', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const res = await ratio1.r1fs.calculateJsonCid({ data: testData, nonce: 1, fn: 'test.json', secret: 'test-secret' }, {fullResponse: true}) as any
+        expect(res.result.cid).toBeDefined()
+    })
+
+    it('calculate_pickle_cid calculates cid without storing', async () => {
+        const testData = { name: 'test', value: 123, nested: { key: 'value' } }
+        const res = await ratio1.r1fs.calculatePickleCid({ data: testData, nonce: 1, fn: 'test.pkl', secret: 'test-secret' }, {fullResponse: true}) as any
+        expect(res.result.cid).toBeDefined()
+    })
 })

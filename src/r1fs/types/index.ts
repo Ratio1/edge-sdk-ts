@@ -99,3 +99,18 @@ export interface R1FSCidResult {
 }
 
 export interface R1FSCidResponse extends R1FSBaseResponse<R1FSCidResult> {}
+
+// Pickle operation interfaces
+export interface StorePickleRequest {
+  data: any
+  fn?: string
+  secret?: string
+  nonce?: number
+}
+
+export interface CalculatePickleCidRequest {
+  data: any
+  nonce: number
+  fn?: string
+  secret?: string
+}

@@ -57,6 +57,61 @@ describe('r1fs e2e', () => {
     expect(res.file_path).toBe("/path/to/file")
     expect(res.meta?.filename).toBe("test.txt")
   })
+
+  it('add_yaml stores yaml data', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .post('/add_yaml')
+      .reply(200, { result: { cid: 'yaml-cid-123' } })
+    const res = await client.r1fs.addYaml({ data: testData, fn: 'test.yaml', secret: 'test-secret' })
+    expect((res as any).cid).toBe('yaml-cid-123')
+  })
+
+  it('get_yaml retrieves yaml data', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .get('/get_yaml')
+      .query({ cid: 'yaml-cid-123', secret: 'test-secret' })
+      .reply(200, { result: { file_data: testData } })
+    const res = await client.r1fs.getYaml({ cid: 'yaml-cid-123', secret: 'test-secret' })
+    expect(res.file_data).toEqual(testData)
+  })
+
+  it('add_json stores json data', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .post('/add_json')
+      .reply(200, { result: { cid: 'json-cid-123' } })
+    const res = await client.r1fs.addJson({ data: testData, fn: 'test.json', secret: 'test-secret', nonce: 1 })
+    expect((res as any).cid).toBe('json-cid-123')
+  })
+
+  it('add_pickle stores pickle data', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .post('/add_pickle')
+      .reply(200, { result: { cid: 'pickle-cid-123' } })
+    const res = await client.r1fs.addPickle({ data: testData, fn: 'test.pkl', secret: 'test-secret', nonce: 1 })
+    expect((res as any).cid).toBe('pickle-cid-123')
+  })
+
+  it('calculate_json_cid calculates cid without storing', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .post('/calculate_json_cid')
+      .reply(200, { result: { cid: 'calculated-json-cid-123' } })
+    const res = await client.r1fs.calculateJsonCid({ data: testData, nonce: 1, fn: 'test.json', secret: 'test-secret' })
+    expect((res as any).cid).toBe('calculated-json-cid-123')
+  })
+
+  it('calculate_pickle_cid calculates cid without storing', async () => {
+    const testData = { name: 'test', value: 123 }
+    nock(r1fsBase)
+      .post('/calculate_pickle_cid')
+      .reply(200, { result: { cid: 'calculated-pickle-cid-123' } })
+    const res = await client.r1fs.calculatePickleCid({ data: testData, nonce: 1, fn: 'test.pkl', secret: 'test-secret' })
+    expect((res as any).cid).toBe('calculated-pickle-cid-123')
+  })
   //
   // it('add_file_base64 uploads data', async () => {
   //   const res = await client.r1fs.addFileBase64({ file_base64_str: baseStr, filename: 'mock.txt' })

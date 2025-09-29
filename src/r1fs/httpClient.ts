@@ -18,7 +18,9 @@ import {
   type StoreJsonRequest,
   type CalculateCidRequest,
   type R1FSCidResult,
-  type R1FSCidResponse
+  type R1FSCidResponse,
+  type StorePickleRequest,
+  type CalculatePickleCidRequest
 } from './types'
 import { getFormData } from '../common/platform'
 
@@ -148,6 +150,24 @@ export class R1FSHttpClient extends BaseHttpClient {
 
   async calculateJsonCid (data: CalculateCidRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
     const res = await this.request('/calculate_json_cid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return await this.parseResponse<R1FSCidResult>(res, opts)
+  }
+
+  async addPickle (data: StorePickleRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    const res = await this.request('/add_pickle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    return await this.parseResponse<R1FSCidResult>(res, opts)
+  }
+
+  async calculatePickleCid (data: CalculatePickleCidRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    const res = await this.request('/calculate_pickle_cid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)

@@ -16,7 +16,9 @@ import type {
   StoreJsonRequest,
   CalculateCidRequest,
   R1FSCidResult,
-  R1FSCidResponse
+  R1FSCidResponse,
+  StorePickleRequest,
+  CalculatePickleCidRequest
 } from './types'
 
 export class R1FSService {
@@ -65,5 +67,16 @@ export class R1FSService {
     if (!data.data) throw new Error('data is required')
     if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
     return this.http.calculateJsonCid(data, opts)
+  }
+
+  addPickle(data: StorePickleRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    return this.http.addPickle(data, opts)
+  }
+
+  calculatePickleCid(data: CalculatePickleCidRequest, opts?: { fullResponse?: boolean }): Promise<R1FSCidResult | R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
+    return this.http.calculatePickleCid(data, opts)
   }
 }
