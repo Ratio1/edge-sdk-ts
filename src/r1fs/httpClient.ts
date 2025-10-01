@@ -1,5 +1,6 @@
 import { BaseHttpClient } from '../common/baseHttpClient'
 import type { HttpAdapter } from '../common/http/adapter'
+import type { BaseResponse } from '../common/types'
 import {
   type R1FSStatusResult,
   type R1FSUploadResult,
@@ -112,7 +113,7 @@ export class R1FSHttpClient extends BaseHttpClient {
   async getFile ({ cid, secret }: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
     const res = await this.request(`/get_file?${qs}`, { method: 'GET' })
-    return await this.parseResponse<R1FSDownloadResult>(res, opts)
+    return await this.parseFileResponse<R1FSDownloadResult>(res, opts)
   }
 
   async getFileBase64 ({ cid, secret }: DownloadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
@@ -173,5 +174,33 @@ export class R1FSHttpClient extends BaseHttpClient {
       body: JSON.stringify(data)
     })
     return await this.parseResponse<R1FSCidResult>(res, opts)
+  }
+
+  /**
+   * Parse file response that may contain binary data
+   * For getFile operations, the server returns binary data directly, not JSON
+   */
+  protected async parseFileResponse<T>(res: Response, opts?: { fullResponse?: boolean }): Promise<T | BaseResponse<T>> {
+    const contentType = res.headers.get('content-type') || ''
+    
+    // If content-type indicates JSON, use standard parsing
+    if (contentType.includes('application/json')) {
+      return await this.parseResponse<T>(res, opts)
+    }
+    
+    // For binary content, return the response object directly
+    // This allows the caller to access .blob(), .arrayBuffer(), etc.
+    const result = {
+      result: res as any, // The response object itself
+      server_node_addr: '',
+      evm_network: '',
+      ee_node_alias: '',
+      ee_node_address: '',
+      ee_node_eth_address: '',
+      ee_node_network: '',
+      ee_node_ver: ''
+    } as BaseResponse<T>
+    
+    return opts?.fullResponse ? result : result.result
   }
 }

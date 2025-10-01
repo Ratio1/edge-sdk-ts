@@ -26,15 +26,14 @@ describe('r1fs e2e', () => {
     })
 
     it('get_file downloads data', async () => {
-        try {
-            const res = await ratio1.r1fs.getFile({ cid: cidFile })
-            expect(res.file_path).toBeDefined()
-            expect(res.meta?.filename).toBeDefined()
-        } catch (error) {
-            // If the server returns raw content instead of JSON, that's also valid
-            console.log('get_file returned raw content (expected behavior)')
-            expect((error as Error).message).toContain('Failed to parse response')
-        }
+        const res = await ratio1.r1fs.getFile({ cid: cidFile })
+        // getFile now returns the raw Response object for binary data
+        expect(res).toBeDefined()
+        console.log("#2222")
+        console.log("#aaaaasds")
+        console.log(res)
+        // The response should be a Response object that can be used to get binary data
+        expect(typeof res).toBe('object')
     })
 
     it('add_file_base64 uploads data', async () => {
