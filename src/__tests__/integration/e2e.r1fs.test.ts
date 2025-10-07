@@ -11,6 +11,10 @@ let cidB64: string
 const fileContent = 'content'
 const baseStr = Buffer.from('more').toString('base64')
 
+function delay (ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 describe('r1fs e2e', () => {
     it('get_status works', async () => {
         const res = await ratio1.r1fs.getStatus()
@@ -27,12 +31,7 @@ describe('r1fs e2e', () => {
 
     it('get_file downloads data', async () => {
         const res = await ratio1.r1fs.getFile({ cid: cidFile })
-        // getFile now returns the raw Response object for binary data
         expect(res).toBeDefined()
-        console.log("#2222")
-        console.log("#aaaaasds")
-        console.log(res)
-        // The response should be a Response object that can be used to get binary data
         expect(typeof res).toBe('object')
     })
 
@@ -55,12 +54,30 @@ describe('r1fs e2e', () => {
 
     it('get_yaml retrieves yaml data', async () => {
         const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-        const addRes = await ratio1.r1fs.addYaml({ data: testData, fn: 'test.yaml' }, {fullResponse: true}) as any
+        const secret = 'test-secret-get'
+        const addRes = await ratio1.r1fs.addYaml({ data: testData, fn: 'test.yaml', secret }, { fullResponse: true }) as any
+        console.log("====================")
+        console.log("====================---------")
+        console.log(addRes)
         expect(addRes.result.cid).toBeDefined()
         const cid = addRes.result.cid
-        
-        const res = await ratio1.r1fs.getYaml({ cid })
-        expect(res.file_data).toEqual(testData)
+
+        let attempts = 0
+        let received: any = null
+        while (attempts < 5 && !received) {
+            console.log(`[r1fs:get_yaml] attempt ${attempts + 1} for cid ${cid}`)
+            const res = await ratio1.r1fs.getYaml({ cid, secret })
+            if (res?.file_data) {
+                console.log(`[r1fs:get_yaml] received payload for cid ${cid}`)
+                received = res.file_data
+                break
+            }
+            console.log(`[r1fs:get_yaml] retrying cid ${cid} after delay`)
+            await delay(500)
+            attempts += 1
+        }
+
+        expect(received).toEqual(testData)
     })
 
     it('add_json stores json data', async () => {

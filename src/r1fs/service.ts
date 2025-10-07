@@ -29,7 +29,7 @@ export class R1FSService {
   }
 
   addFile(data: UploadFileRequest, opts?: { fullResponse?: boolean }): Promise<R1FSUploadResult | R1FSUploadResponse> {
-    if (!data?.formData) throw new Error('formData is required')
+    if (!data?.formData && !data?.file) throw new Error('file or formData is required')
     return this.http.addFile(data, opts)
   }
 

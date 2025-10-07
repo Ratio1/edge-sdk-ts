@@ -1,6 +1,7 @@
 import createRatio1EdgeNodeClient from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
+import { Readable } from 'stream'
 
 const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
 const client = createRatio1EdgeNodeClient({ r1fsUrl: r1fsBase, cstoreUrl: 'http://localhost:31234', verbose: true, httpAdapter: { fetch: crossFetch as any } })
@@ -23,27 +24,17 @@ describe('r1fs e2e', () => {
     expect(res).toBeDefined()
   })
 
-  it('add_file uploads data', async () => {
-    // Create a mock FormData-like object for testing
-    const mockFormData = {
-      get: (name: string) => {
-        switch (name) {
-          case 'file':
-            return Buffer.from(fileContent);
-          case 'filename':
-            return 'mock.txt';
-          case 'secret':
-            return 'test-secret';
-          default:
-            return null;
-        }
-      }
-    };
+  it('add_file streams data from a readable source', async () => {
+    const stream = Readable.from([fileContent])
 
     nock(r1fsBase)
       .post('/add_file')
       .reply(200, { result: { cid: 'mockcid' } })
-    const res = await client.r1fs.addFile({ formData: mockFormData as any })
+    const res = await client.r1fs.addFile({
+      file: stream,
+      filename: 'mock.txt',
+      secret: 'test-secret'
+    })
     expect((res as any).cid).toBeDefined()
     cidFile = (res as any).cid!
   })

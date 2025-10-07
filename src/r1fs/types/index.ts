@@ -38,14 +38,51 @@ export interface UploadMetadata {
   nonce?: number
 }
 
-// Interface for the FormData-like object that addFile expects
+// Interface for the FormData-like object that addFile can re-use (Node form-data package)
 export interface UploadFormData {
-  get(name: string): File | Buffer | string | null
   append(name: string, value: any, options?: any): void
+  get?(name: string): File | Buffer | string | null
+  set?(name: string, value: any, options?: any): void
+  delete?(name: string): void
 }
 
+export type UploadFileLike = File | Blob | Buffer | NodeJS.ReadableStream
+
 export interface UploadFileRequest {
-  formData: UploadFormData
+  /**
+   * Provide an existing FormData instance. When omitted the client will create a new one.
+   * When provided, ensure it already contains a `file` field pointing to the payload.
+   */
+  formData?: UploadFormData | FormData
+  /**
+   * Optional raw file source. Supports File/Blob in the browser, Buffer or Readable stream in Node.js.
+   * When supplied, the client will create the multipart body and stream it when possible.
+   */
+  file?: UploadFileLike
+  /**
+   * Controls the multipart field name. Defaults to `file`.
+   */
+  fieldName?: string
+  /**
+   * Friendly filename reported to the server. Used as a fallback when metadata.filename is absent.
+   */
+  filename?: string
+  /**
+   * Secret associated with the upload.
+   */
+  secret?: string
+  /**
+   * Nonce associated with the upload.
+   */
+  nonce?: number
+  /**
+   * Explicit metadata payload. Overrides values derived from filename/secret/nonce.
+   */
+  metadata?: UploadMetadata
+  /**
+   * Optional content-type hint for Node.js streaming uploads.
+   */
+  contentType?: string
 }
 
 export interface UploadBase64Request {

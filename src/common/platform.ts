@@ -7,9 +7,19 @@ export function getFetch (): typeof fetch {
 }
 
 export function getFormData (): typeof FormData {
-  if (typeof globalThis !== 'undefined' && typeof (globalThis as any).FormData !== 'undefined') {
-    return (globalThis as any).FormData
+  const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined'
+
+  if (isBrowser && typeof window.FormData !== 'undefined') {
+    return window.FormData
   }
-  const fd = require('form-data')
-  return fd.default || fd
+
+  try {
+    const fd = require('form-data')
+    return fd.default || fd
+  } catch (err) {
+    if (typeof globalThis !== 'undefined' && typeof (globalThis as any).FormData !== 'undefined') {
+      return (globalThis as any).FormData
+    }
+    throw err
+  }
 }

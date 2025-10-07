@@ -1,6 +1,8 @@
 import nock from 'nock'
 import createRatio1EdgeNodeClient from '../index'
 import crossFetch from 'cross-fetch'
+import { Readable } from 'stream'
+import FormData from 'form-data'
 
 describe('R1FSClient', () => {
   const baseUrl = 'http://localhost:31235'
@@ -19,30 +21,38 @@ describe('R1FSClient', () => {
     expect((res as any).ok).toBe(true)
   })
 
-  it('addFile uploads data with correct structure', async () => {
+  it('addFile streams data when provided with a readable', async () => {
     // Mock the server response
     nock(baseUrl)
       .post('/add_file')
       .reply(200, { result: { cid: 'test-cid-123', message: 'ok' } })
 
-    // Create a mock FormData-like object for testing
-    const mockFormData = {
-      get: (name: string) => {
-        switch (name) {
-          case 'file':
-            return Buffer.from('test content');
-          case 'filename':
-            return 'test.txt';
-          case 'secret':
-            return 'test-secret';
-          default:
-            return null;
-        }
-      }
-    };
+    const readable = Readable.from(['test content'])
 
-    const res = await client.r1fs.addFile({ formData: mockFormData as any })
+    const res = await client.r1fs.addFile({
+      file: readable,
+      filename: 'test.txt',
+      secret: 'test-secret',
+      nonce: 7,
+      contentType: 'text/plain'
+    })
     expect((res as any).cid).toBe('test-cid-123')
+  })
+
+  it('addFile reuses provided FormData instances', async () => {
+    nock(baseUrl)
+      .post('/add_file')
+      .reply(200, { result: { cid: 'legacy-cid', message: 'ok' } })
+
+    const fd = new FormData()
+    fd.append('file', Buffer.from('legacy content'), { filename: 'legacy.txt', contentType: 'text/plain' })
+
+    const res = await client.r1fs.addFile({
+      formData: fd as any,
+      metadata: { filename: 'legacy.txt', secret: 'legacy-secret' }
+    })
+
+    expect((res as any).cid).toBe('legacy-cid')
   })
 
   it('addYaml calls /add_yaml with correct data', async () => {

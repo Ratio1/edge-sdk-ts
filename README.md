@@ -210,6 +210,54 @@ const uploadResult = await ratio1.r1fs.addFileBase64({
 })
 ```
 
+#### Streaming Uploads (Node.js & Next.js)
+
+```typescript
+import fs from 'node:fs'
+import createRatio1EdgeNodeClient from '@ratio1/edge-node-client'
+
+const ratio1 = createRatio1EdgeNodeClient()
+
+const stream = fs.createReadStream('/tmp/report.csv')
+
+const upload = await ratio1.r1fs.addFile({
+  file: stream,
+  filename: 'report.csv',
+  contentType: 'text/csv',
+  secret: process.env.R1FS_SECRET
+})
+
+console.log(upload.cid)
+```
+
+```typescript
+// app/api/upload/route.ts (Next.js App Router)
+import { NextRequest, NextResponse } from 'next/server'
+import { Readable } from 'node:stream'
+import createRatio1EdgeNodeClient from '@ratio1/edge-node-client'
+
+export async function POST (req: NextRequest) {
+  const form = await req.formData()
+  const file = form.get('file')
+
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: 'file field missing' }, { status: 400 })
+  }
+
+  const ratio1 = createRatio1EdgeNodeClient()
+  const readable = Readable.fromWeb(file.stream())
+
+  const result = await ratio1.r1fs.addFile({
+    file: readable,
+    filename: file.name,
+    contentType: file.type,
+    secret: form.get('secret')?.toString()
+  })
+
+  return NextResponse.json({ cid: result.cid })
+}
+```
+
 #### File Download
 
 ```typescript
