@@ -3,6 +3,8 @@ import createRatio1EdgeNodeClient from '../index'
 import crossFetch from 'cross-fetch'
 import { Readable } from 'stream'
 import FormData from 'form-data'
+import http from 'node:http'
+import type { AddressInfo } from 'node:net'
 
 describe('R1FSClient', () => {
   const baseUrl = 'http://localhost:31235'
@@ -114,5 +116,73 @@ describe('R1FSClient', () => {
 
     const res = await client.r1fs.calculatePickleCid({ data: testData, nonce: 1, fn: 'test.pkl', secret: 'test-secret' })
     expect((res as any).cid).toBe('calculated-pickle-cid-123')
-  })
+})
+})
+
+describe('R1FSClient multipart streaming with undici', () => {
+  it('sends streaming multipart requests with boundary headers', async () => {
+    await new Promise<void>((resolve, reject) => {
+      let settled = false
+      const finish = (err?: Error) => {
+        if (settled) return
+        settled = true
+        if (err) reject(err)
+        else resolve()
+      }
+
+      const server = http.createServer((req, res) => {
+        const chunks: Buffer[] = []
+
+        const handleFailure = (err: Error) => {
+          server.close(() => finish(err))
+        }
+
+        req.on('data', (chunk) => {
+          chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
+        })
+        req.on('error', (err) => {
+          handleFailure(err as Error)
+        })
+        req.on('end', () => {
+          try {
+            expect(req.headers['content-type']).toMatch(/multipart\/form-data; boundary=/)
+            const bodyStr = Buffer.concat(chunks).toString('utf8')
+            expect(bodyStr).toContain('name="file"; filename="stream.txt"')
+            expect(bodyStr).toContain('name="body"')
+            expect(bodyStr).toContain('"filename":"stream.txt"')
+            expect(bodyStr).toContain('"secret":"node-secret"')
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ result: { cid: 'test-cid', message: 'ok' } }))
+          } catch (err) {
+            res.statusCode = 500
+            res.end('error')
+            return handleFailure(err as Error)
+          }
+        })
+      })
+
+      server.on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EACCES' || err.code === 'EPERM') {
+          finish()
+        } else {
+          finish(err)
+        }
+      })
+
+      server.listen(0, '127.0.0.1', async () => {
+        const { port } = server.address() as AddressInfo
+        const sdk = createRatio1EdgeNodeClient({ r1fsUrl: `http://127.0.0.1:${port}`, cstoreUrl: 'http://localhost:31234' })
+
+        try {
+          const stream = Readable.from(['streaming payload'])
+          const result = await sdk.r1fs.addFile({ file: stream, filename: 'stream.txt', secret: 'node-secret' })
+          expect((result as any).cid).toBe('test-cid')
+          server.close((err) => finish(err ?? undefined))
+        } catch (err) {
+          if (settled) return
+          server.close(() => finish(err as Error))
+        }
+      })
+    })
+  }, 10000)
 })

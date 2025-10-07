@@ -1,4 +1,4 @@
-import { BaseHttpClient } from '../common/baseHttpClient'
+import { BaseHttpClient, type RequestOptions } from '../common/baseHttpClient'
 import type { HttpAdapter } from '../common/http/adapter'
 import type { BaseResponse } from '../common/types'
 import {
@@ -102,7 +102,16 @@ export class R1FSHttpClient extends BaseHttpClient {
 
     this.appendMetadata(uploadFormData, resolvedMetadata)
 
-    const res = await this.request('/add_file', { method: 'POST', body: uploadFormData as any })
+    const requestOptions: RequestOptions = { method: 'POST', body: uploadFormData as any }
+
+    if (this.isNodeFormData(uploadFormData) && typeof (uploadFormData as any).getHeaders === 'function') {
+      const formHeaders = (uploadFormData as any).getHeaders() ?? {}
+      if (formHeaders && Object.keys(formHeaders).length > 0) {
+        requestOptions.headers = { ...formHeaders, ...(requestOptions.headers ?? {}) }
+      }
+    }
+
+    const res = await this.request('/add_file', requestOptions)
     return await this.parseResponse<R1FSUploadResult>(res, opts)
   }
 
