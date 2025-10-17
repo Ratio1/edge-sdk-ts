@@ -2,7 +2,7 @@
 
 A comprehensive SDK for interacting with Ratio1 Edge Node services including **CStore** (distributed key-value store) and **R1FS** (distributed file system).
 
-[![npm version](https://badge.fury.io/js/ratio1-sdk-ts.svg)](https://badge.fury.io/js/ratio1-sdk-ts.svg)
+[![npm version](https://badge.fury.io/js/@ratio1%2Fratio1-sdk-ts.svg)](https://badge.fury.io/js/@ratio1%2Fratio1-sdk-ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
