@@ -171,7 +171,66 @@ describe('R1FSClient multipart streaming with undici', () => {
 
       server.listen(0, '127.0.0.1', async () => {
         const { port } = server.address() as AddressInfo
-        const sdk = createEdgeSdk({ r1fsUrl: `http://127.0.0.1:${port}`, cstoreUrl: 'http://localhost:31234' })
+        const sdk = createEdgeSdk({ 
+          r1fsUrl: `http://127.0.0.1:${port}`, 
+          cstoreUrl: 'http://localhost:31234',
+          httpAdapter: {
+            fetch: async (url: string, options?: RequestInit) => {
+              // Use Node.js http module for this test to properly handle FormData
+              const http = require('http')
+              const { URL } = require('url')
+              const urlObj = new URL(url)
+              
+              return new Promise((resolve, reject) => {
+                const req = http.request({
+                  hostname: urlObj.hostname,
+                  port: urlObj.port,
+                  path: urlObj.pathname + urlObj.search,
+                  method: options?.method || 'GET',
+                  headers: options?.headers || {}
+                }, (res: any) => {
+                  const chunks: Buffer[] = []
+                  res.on('data', (chunk: Buffer) => chunks.push(chunk))
+                  res.on('end', () => {
+                    const body = Buffer.concat(chunks)
+                    resolve({
+                      ok: res.statusCode >= 200 && res.statusCode < 300,
+                      status: res.statusCode,
+                      statusText: res.statusMessage,
+                      headers: new Map(Object.entries(res.headers)),
+                      json: () => Promise.resolve(JSON.parse(body.toString())),
+                      text: () => Promise.resolve(body.toString()),
+                      arrayBuffer: () => Promise.resolve(body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)),
+                      // Add missing Response properties
+                      redirected: false,
+                      type: 'basic' as ResponseType,
+                      url: url,
+                      clone: () => { throw new Error('clone not implemented') },
+                      body: null,
+                      bodyUsed: false,
+                      formData: () => Promise.reject(new Error('formData not implemented')),
+                      blob: () => Promise.reject(new Error('blob not implemented'))
+                    } as any)
+                  })
+                })
+                
+                req.on('error', reject)
+                
+                if (options?.body) {
+                  if (typeof options.body === 'object' && options.body.constructor?.name === 'FormData') {
+                    // Pipe the FormData directly to the request
+                    (options.body as any).pipe(req)
+                  } else {
+                    req.write(options.body)
+                    req.end()
+                  }
+                } else {
+                  req.end()
+                }
+              })
+            }
+          }
+        })
 
         try {
           const stream = Readable.from(['streaming payload'])
