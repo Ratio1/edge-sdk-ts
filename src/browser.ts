@@ -6,7 +6,7 @@ import { R1FSService } from './r1fs/service'
 import type { HttpAdapter } from './common/http/adapter'
 import { ensureProtocol } from './helpers'
 
-export interface Ratio1EdgeNodeClientOptions {
+export interface Ratio1SdkOptions {
   cstoreUrl?: string
   r1fsUrl?: string
   chainstorePeers?: string[]
@@ -26,11 +26,11 @@ function getEnvVar(keys: string[]): string | undefined {
   return undefined
 }
 
-export class Ratio1EdgeNodeClient {
+export class Ratio1Sdk {
   readonly cstore: CStoreService
   readonly r1fs: R1FSService
 
-  constructor (opts: Ratio1EdgeNodeClientOptions = {}) {
+  constructor (opts: Ratio1SdkOptions = {}) {
     let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
     let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
     const chainstorePeersStr = opts.chainstorePeers ?? getEnvVar(['EE_CHAINSTORE_PEERS']) ?? []
@@ -48,7 +48,7 @@ export class Ratio1EdgeNodeClient {
       console.warn('Failed to parse chainstorePeers, using empty array', e)
     }
 
-    console.log('[edge-node-client] Initializing Ratio1EdgeNodeClient with peers', chainstorePeers)
+    console.log('[ratio1-sdk-ts] Initializing Ratio1Sdk with peers', chainstorePeers)
 
     const cstoreHttp = new CStoreHttpClient(cstoreUrl, verbose, adapter, chainstorePeers)
     const r1fsHttp = new R1FSHttpClient(r1fsUrl, verbose, adapter, formDataCtor, chainstorePeers)
@@ -59,8 +59,8 @@ export class Ratio1EdgeNodeClient {
 }
 
 // Browser-safe client creation
-export function createRatio1EdgeNodeBrowserClient(opts?: Ratio1EdgeNodeClientOptions): Ratio1EdgeNodeClient {
-  return new Ratio1EdgeNodeClient(opts)
+export function createRatio1SdkBrowserClient(opts?: Ratio1SdkOptions): Ratio1Sdk {
+  return new Ratio1Sdk(opts)
 }
 
 // Export everything from the main module

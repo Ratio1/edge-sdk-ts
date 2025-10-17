@@ -1,6 +1,6 @@
 {
-  "name": "@ratio1/edge-node-client",
-  "version": "1.1.4",
+  "name": "@ratio1/ratio1-sdk-ts",
+  "version": "1.1.5",
   "description": "SDK for interacting with Ratio1 edge node services (CStore and R1FS)",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",

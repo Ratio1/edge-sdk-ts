@@ -1,9 +1,9 @@
-import createRatio1EdgeNodeClient from '../index'
+import createRatio1Sdk from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
 
 const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
-const client = createRatio1EdgeNodeClient({ cstoreUrl: cstoreBase, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
+const client = createRatio1Sdk({ cstoreUrl: cstoreBase, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
 
 let storedKey = 'e2e-key'
 

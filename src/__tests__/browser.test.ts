@@ -1,8 +1,8 @@
-import { createRatio1EdgeNodeBrowserClient } from '../browser'
+import { createRatio1SdkBrowserClient } from '../browser'
 
 describe('Browser Client', () => {
   it('should create a browser client successfully', () => {
-    const ratio1 = createRatio1EdgeNodeBrowserClient({
+    const ratio1 = createRatio1SdkBrowserClient({
       cstoreUrl: 'http://localhost:31234',
       r1fsUrl: 'http://localhost:31235'
     })
@@ -20,7 +20,7 @@ describe('Browser Client', () => {
         R1FS_API_URL: 'http://localhost:31235'
       }
     } as any
-    const ratio1 = createRatio1EdgeNodeBrowserClient()
+    const ratio1 = createRatio1SdkBrowserClient()
 
     expect(ratio1).toBeDefined()
     expect(ratio1.cstore).toBeDefined()
@@ -34,7 +34,7 @@ describe('Browser Client', () => {
         R1FS_API_URL: 'http://localhost:31235'
       }
     } as any
-    const ratio1 = createRatio1EdgeNodeBrowserClient()
+    const ratio1 = createRatio1SdkBrowserClient()
 
     // Create a mock FormData with Buffer (simulating test environment)
     const mockFormData = {

@@ -18,13 +18,13 @@ export class BaseHttpClient {
     const url = `${this.baseUrl}${endpoint}`
     const start = Date.now()
     if (this.verbose) {
-      console.debug('[edge-node-client] request', { url, ...options })
+      console.debug('[ratio1-sdk-ts] request', { url, ...options })
     }
 
     const res = await this.http.fetch(url, options)
     const duration = Date.now() - start
     if (this.verbose) {
-      console.debug('[edge-node-client] response', { url, status: res.status, duration })
+      console.debug('[ratio1-sdk-ts] response', { url, status: res.status, duration })
     }
     if (!res.ok) {
       const err = new Error(`Request failed with status ${res.status}`);
