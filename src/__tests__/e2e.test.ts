@@ -1,12 +1,12 @@
-import createRatio1Sdk from '../index'
+import createEdgeSdk from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
 
 const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
 const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
-const client = createRatio1Sdk({ cstoreUrl: cstoreBase, r1fsUrl: r1fsBase, httpAdapter: { fetch: crossFetch as any } })
+const client = createEdgeSdk({ cstoreUrl: cstoreBase, r1fsUrl: r1fsBase, httpAdapter: { fetch: crossFetch as any } })
 
-describe('Ratio1Sdk e2e', () => {
+describe('EdgeSdk e2e', () => {
   afterEach(() => {
     nock.cleanAll()
   })

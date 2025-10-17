@@ -5,7 +5,7 @@ import { R1FSService } from './r1fs/service'
 import type { HttpAdapter } from './common/http/adapter'
 import { ensureProtocol } from './helpers'
 
-export interface Ratio1SdkOptions {
+export interface EdgeSdkOptions {
   cstoreUrl?: string
   r1fsUrl?: string
   chainstorePeers?: string[]
@@ -38,11 +38,11 @@ function getEnvVar(keys: string[]): string | undefined {
   return undefined
 }
 
-export class Ratio1Sdk {
+export class EdgeSdk {
   readonly cstore: CStoreService
   readonly r1fs: R1FSService
 
-  constructor (opts: Ratio1SdkOptions = {}) {
+  constructor (opts: EdgeSdkOptions = {}) {
     let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
     let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
     const chainstorePeersStr = opts.chainstorePeers ?? getEnvVar(['EE_CHAINSTORE_PEERS']) ?? []
@@ -51,7 +51,7 @@ export class Ratio1Sdk {
     const verbose = opts.verbose ?? opts.debug ?? false
 
     if (verbose) {
-      console.log('[ratio1-sdk-ts] Initializing Ratio1Sdk with peers', chainstorePeersStr)
+      console.log('[edge-sdk-ts] Initializing EdgeSdk with peers', chainstorePeersStr)
     }
 
     const adapter = opts.httpAdapter
@@ -72,8 +72,8 @@ export class Ratio1Sdk {
   }
 }
 
-export default function createRatio1Sdk (opts?: Ratio1SdkOptions): Ratio1Sdk {
-  return new Ratio1Sdk(opts)
+export default function createEdgeSdk (opts?: EdgeSdkOptions): EdgeSdk {
+  return new EdgeSdk(opts)
 }
 
 export * from './types'

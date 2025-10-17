@@ -1,5 +1,5 @@
 import nock from 'nock'
-import createRatio1Sdk from '../index'
+import createEdgeSdk from '../index'
 import crossFetch from 'cross-fetch'
 import { Readable } from 'stream'
 import FormData from 'form-data'
@@ -8,7 +8,7 @@ import type { AddressInfo } from 'node:net'
 
 describe('R1FSClient', () => {
   const baseUrl = 'http://localhost:31235'
-  const client = createRatio1Sdk({ r1fsUrl: baseUrl, cstoreUrl: 'http://localhost:31234', httpAdapter: { fetch: crossFetch as any } })
+  const client = createEdgeSdk({ r1fsUrl: baseUrl, cstoreUrl: 'http://localhost:31234', httpAdapter: { fetch: crossFetch as any } })
 
   afterEach(() => {
     nock.cleanAll()
@@ -171,7 +171,7 @@ describe('R1FSClient multipart streaming with undici', () => {
 
       server.listen(0, '127.0.0.1', async () => {
         const { port } = server.address() as AddressInfo
-        const sdk = createRatio1Sdk({ r1fsUrl: `http://127.0.0.1:${port}`, cstoreUrl: 'http://localhost:31234' })
+        const sdk = createEdgeSdk({ r1fsUrl: `http://127.0.0.1:${port}`, cstoreUrl: 'http://localhost:31234' })
 
         try {
           const stream = Readable.from(['streaming payload'])

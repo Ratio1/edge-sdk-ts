@@ -1,10 +1,10 @@
-import createRatio1Sdk from '../index'
+import createEdgeSdk from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
 import { Readable } from 'stream'
 
 const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
-const client = createRatio1Sdk({ r1fsUrl: r1fsBase, cstoreUrl: 'http://localhost:31234', verbose: true, httpAdapter: { fetch: crossFetch as any } })
+const client = createEdgeSdk({ r1fsUrl: r1fsBase, cstoreUrl: 'http://localhost:31234', verbose: true, httpAdapter: { fetch: crossFetch as any } })
 
 let cidFile: string
 let cidB64: string

@@ -1,14 +1,14 @@
-// Example usage of @ratio1/ratio1-sdk-ts inside a Next.js application
+// Example usage of @ratio1/edge-sdk-ts inside a Next.js application
 
-import { createRatio1SdkBrowserClient } from '@ratio1/ratio1-sdk-ts/browser'
-import createRatio1Sdk from '@ratio1/ratio1-sdk-ts'
+import { createEdgeSdkBrowserClient } from '@ratio1/edge-sdk-ts/browser'
+import createEdgeSdk from '@ratio1/edge-sdk-ts'
 import { Readable } from 'node:stream'
 
 // -------------------------------------------------------------------------------------
 // Client Components / Browser usage
 // -------------------------------------------------------------------------------------
 export async function clientSideExample (): Promise<void> {
-  const ratio1 = createRatio1SdkBrowserClient({
+  const ratio1 = createEdgeSdkBrowserClient({
     cstoreUrl: process.env.NEXT_PUBLIC_CSTORE_API_URL,
     r1fsUrl: process.env.NEXT_PUBLIC_R1FS_API_URL
   })
@@ -33,7 +33,7 @@ export async function appRouterUploadExample (req: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: 'file field missing' }), { status: 400 })
   }
 
-  const ratio1 = createRatio1Sdk({
+  const ratio1 = createEdgeSdk({
     cstoreUrl: process.env.CSTORE_API_URL,
     r1fsUrl: process.env.R1FS_API_URL
   })
@@ -64,7 +64,7 @@ export async function pagesApiRouteExample (req: any, res: any): Promise<void> {
     return
   }
 
-  const ratio1 = createRatio1Sdk({
+  const ratio1 = createEdgeSdk({
     cstoreUrl: process.env.CSTORE_API_URL,
     r1fsUrl: process.env.R1FS_API_URL
   })
