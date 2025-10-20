@@ -2,8 +2,8 @@ import crossFetch from 'cross-fetch'
 import nock from 'nock'
 import createEdgeSdk from '../index'
 
-const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
-const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
+const cstoreBase = process.env.CSTORE_API_URL ?? 'http://localhost:31234'
+const r1fsBase = process.env.R1FS_API_URL ?? 'http://localhost:31235'
 const client = createEdgeSdk({
   cstoreUrl: cstoreBase,
   r1fsUrl: r1fsBase,

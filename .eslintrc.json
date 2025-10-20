@@ -2,7 +2,7 @@
   "root": true,
   "extends": ["standard-with-typescript", "plugin:prettier/recommended"],
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.eslint.json"
   },
   "env": {
     "node": true,

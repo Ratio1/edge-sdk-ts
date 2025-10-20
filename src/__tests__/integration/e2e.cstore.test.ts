@@ -1,11 +1,11 @@
 import createClient from '../../index'
 
-const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
-const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
+const cstoreBase = process.env.CSTORE_API_URL ?? 'http://localhost:31234'
+const r1fsBase = process.env.R1FS_API_URL ?? 'http://localhost:31235'
 const ratio1 = createClient({ cstoreUrl: cstoreBase, r1fsUrl: r1fsBase })
 
-let storedKey = `e2e-key-${Date.now()}`
-let hkey = `e2e-hkey-${Date.now()}`
+const storedKey = `e2e-key-${Date.now()}`
+const hkey = `e2e-hkey-${Date.now()}`
 
 describe('cstore e2e', () => {
   it('get_status returns info', async () => {

@@ -36,22 +36,6 @@ describe('Browser Client', () => {
     } as any
     const ratio1 = createEdgeSdkBrowserClient()
 
-    // Create a mock FormData with Buffer (simulating test environment)
-    const mockFormData = {
-      get: (name: string) => {
-        switch (name) {
-          case 'file':
-            return Buffer.from('test content')
-          case 'filename':
-            return 'test.txt'
-          case 'secret':
-            return 'test-secret'
-          default:
-            return null
-        }
-      }
-    }
-
     // This should not throw an error - Buffer should be converted to Blob
     expect(() => {
       // We're not actually calling the method, just testing that the ratio1 can handle it

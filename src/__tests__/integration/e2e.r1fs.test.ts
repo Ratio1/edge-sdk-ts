@@ -1,17 +1,19 @@
 import createClient from '../../index'
 
-const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
-const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
+const cstoreBase = process.env.CSTORE_API_URL ?? 'http://localhost:31234'
+const r1fsBase = process.env.R1FS_API_URL ?? 'http://localhost:31235'
 const ratio1 = createClient({ cstoreUrl: cstoreBase, r1fsUrl: r1fsBase })
 
-let cidFile: string
-let cidB64: string
+let cidFile: string | undefined
+let cidB64: string | undefined
 
 const fileContent = 'content'
 const baseStr = Buffer.from('more').toString('base64')
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+const delay = async (ms: number): Promise<void> => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
 
 describe('r1fs e2e', () => {
@@ -25,10 +27,15 @@ describe('r1fs e2e', () => {
     formData.append('file', new Blob([fileContent]), 'mock.txt')
     const res = (await ratio1.r1fs.addFile({ formData }, { fullResponse: true })) as any
     expect(res.result.cid).toBeDefined()
-    cidFile = res.result.cid!
+    const cid = res.result?.cid
+    expect(typeof cid).toBe('string')
+    cidFile = cid
   })
 
   it('get_file downloads data', async () => {
+    if (!cidFile) {
+      throw new Error('cidFile not set')
+    }
     const res = await ratio1.r1fs.getFile({ cid: cidFile })
     expect(res).toBeDefined()
     expect(typeof res).toBe('object')
@@ -40,10 +47,15 @@ describe('r1fs e2e', () => {
       { fullResponse: true }
     )) as any
     expect(res.result.cid).toBeDefined()
-    cidB64 = res.result.cid!
+    const cid = res.result?.cid
+    expect(typeof cid).toBe('string')
+    cidB64 = cid
   })
 
   it('get_file_base64 downloads data', async () => {
+    if (!cidB64) {
+      throw new Error('cidB64 not set')
+    }
     const res = await ratio1.r1fs.getFileBase64({ cid: cidB64 })
     expect(res.file_base64_str).toBe(baseStr)
   })

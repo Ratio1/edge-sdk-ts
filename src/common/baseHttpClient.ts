@@ -7,6 +7,14 @@ export interface RequestOptions {
   body?: string | FormData | any
 }
 
+export interface FullResponseOptions {
+  fullResponse: true
+}
+export interface ResultOnlyOptions {
+  fullResponse?: false
+}
+export type ResponseOptions = FullResponseOptions | ResultOnlyOptions
+
 export class BaseHttpClient {
   constructor(
     protected readonly baseUrl: string,
@@ -36,7 +44,12 @@ export class BaseHttpClient {
 
   protected async parseResponse<T>(
     res: Response,
-    opts?: { fullResponse?: boolean }
+    opts: FullResponseOptions
+  ): Promise<BaseResponse<T>>
+  protected async parseResponse<T>(res: Response, opts?: ResultOnlyOptions): Promise<T>
+  protected async parseResponse<T>(
+    res: Response,
+    opts?: ResponseOptions
   ): Promise<T | BaseResponse<T>> {
     let data: BaseResponse<T>
     try {

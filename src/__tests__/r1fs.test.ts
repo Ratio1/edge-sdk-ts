@@ -3,7 +3,7 @@ import nock from 'nock'
 import { Readable } from 'stream'
 import createEdgeSdk from '../index'
 
-const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
+const r1fsBase = process.env.R1FS_API_URL ?? 'http://localhost:31235'
 const client = createEdgeSdk({
   r1fsUrl: r1fsBase,
   cstoreUrl: 'http://localhost:31234',
@@ -11,11 +11,7 @@ const client = createEdgeSdk({
   httpAdapter: { fetch: crossFetch as any }
 })
 
-let cidFile: string
-let cidB64: string
-
 const fileContent = 'content'
-const baseStr = Buffer.from('more').toString('base64')
 
 describe('r1fs e2e', () => {
   afterEach(() => {
@@ -48,7 +44,6 @@ describe('r1fs e2e', () => {
       secret: 'test-secret'
     })
     expect((res as any).cid).toBeDefined()
-    cidFile = (res as any).cid!
   })
 
   it('get_file downloads data', async () => {

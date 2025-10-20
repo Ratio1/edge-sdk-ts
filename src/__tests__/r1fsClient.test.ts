@@ -2,7 +2,9 @@ import crossFetch from 'cross-fetch'
 import FormData from 'form-data'
 import nock from 'nock'
 import http from 'node:http'
+import type { IncomingMessage, RequestOptions } from 'node:http'
 import type { AddressInfo } from 'node:net'
+import { URL } from 'node:url'
 import { Readable } from 'stream'
 import createEdgeSdk from '../index'
 
@@ -164,7 +166,7 @@ describe('R1FSClient multipart streaming with undici', () => {
   it('sends streaming multipart requests with boundary headers', async () => {
     await new Promise<void>((resolve, reject) => {
       let settled = false
-      const finish = (err?: Error) => {
+      const finish = (err?: Error): void => {
         if (settled) return
         settled = true
         if (err) reject(err)
@@ -174,15 +176,17 @@ describe('R1FSClient multipart streaming with undici', () => {
       const server = http.createServer((req, res) => {
         const chunks: Buffer[] = []
 
-        const handleFailure = (err: Error) => {
-          server.close(() => finish(err))
+        const handleFailure = (err: Error): void => {
+          server.close(() => {
+            finish(err)
+          })
         }
 
-        req.on('data', (chunk) => {
+        req.on('data', (chunk: Buffer | string) => {
           chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
         })
-        req.on('error', (err) => {
-          handleFailure(err as Error)
+        req.on('error', (err: Error) => {
+          handleFailure(err)
         })
         req.on('end', () => {
           try {
@@ -197,7 +201,7 @@ describe('R1FSClient multipart streaming with undici', () => {
           } catch (err) {
             res.statusCode = 500
             res.end('error')
-            return handleFailure(err as Error)
+            handleFailure(err instanceof Error ? err : new Error(String(err)))
           }
         })
       })
@@ -210,93 +214,99 @@ describe('R1FSClient multipart streaming with undici', () => {
         }
       })
 
-      server.listen(0, '127.0.0.1', async () => {
-        const { port } = server.address() as AddressInfo
-        const sdk = createEdgeSdk({
-          r1fsUrl: `http://127.0.0.1:${port}`,
-          cstoreUrl: 'http://localhost:31234',
-          httpAdapter: {
-            fetch: async (url: string, options?: RequestInit) => {
-              // Use Node.js http module for this test to properly handle FormData
-              const http = require('http')
-              const { URL } = require('url')
-              const urlObj = new URL(url)
+      server.listen(0, '127.0.0.1', () => {
+        void (async () => {
+          const { port } = server.address() as AddressInfo
+          const sdk = createEdgeSdk({
+            r1fsUrl: `http://127.0.0.1:${port}`,
+            cstoreUrl: 'http://localhost:31234',
+            httpAdapter: {
+              fetch: async (url: string, options?: RequestInit) => {
+                const urlObj = new URL(url)
 
-              return new Promise((resolve, reject) => {
-                const req = http.request(
-                  {
+                return await new Promise<Response>((resolve, reject) => {
+                  const headerBag = new Headers(options?.headers ?? {})
+                  const requestHeaders: Record<string, string> = {}
+                  headerBag.forEach((value, key) => {
+                    requestHeaders[key] = value
+                  })
+
+                  const requestOptions: RequestOptions = {
                     hostname: urlObj.hostname,
                     port: urlObj.port,
-                    path: urlObj.pathname + urlObj.search,
-                    method: options?.method || 'GET',
-                    headers: options?.headers || {}
-                  },
-                  (res: any) => {
-                    const chunks: Buffer[] = []
-                    res.on('data', (chunk: Buffer) => chunks.push(chunk))
+                    path: `${urlObj.pathname}${urlObj.search}`,
+                    method: options?.method ?? 'GET',
+                    headers: requestHeaders
+                  }
+
+                  const req = http.request(requestOptions, (res: IncomingMessage) => {
+                    const responseChunks: Buffer[] = []
+                    res.on('data', (chunk: Buffer) => responseChunks.push(chunk))
                     res.on('end', () => {
-                      const body = Buffer.concat(chunks)
-                      resolve({
-                        ok: res.statusCode >= 200 && res.statusCode < 300,
-                        status: res.statusCode,
-                        statusText: res.statusMessage,
-                        headers: new Map(Object.entries(res.headers)),
-                        json: () => Promise.resolve(JSON.parse(body.toString())),
-                        text: () => Promise.resolve(body.toString()),
-                        arrayBuffer: () =>
-                          Promise.resolve(
-                            body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
-                          ),
-                        // Add missing Response properties
-                        redirected: false,
-                        type: 'basic' as ResponseType,
-                        url: url,
-                        clone: () => {
-                          throw new Error('clone not implemented')
-                        },
-                        body: null,
-                        bodyUsed: false,
-                        formData: () => Promise.reject(new Error('formData not implemented')),
-                        blob: () => Promise.reject(new Error('blob not implemented'))
-                      } as any)
+                      const body = Buffer.concat(responseChunks)
+                      const headers = new Headers()
+                      const appendHeader = (key: string, value: string): void => {
+                        headers.append(key, value)
+                      }
+                      Object.entries(res.headers).forEach(([key, value]) => {
+                        if (value === undefined) return
+                        if (Array.isArray(value)) {
+                          value.forEach((entry) => {
+                            appendHeader(key, entry)
+                          })
+                          return
+                        }
+                        appendHeader(key, value)
+                      })
+                      const response = new Response(body, {
+                        status: res.statusCode ?? 0,
+                        statusText: res.statusMessage ?? '',
+                        headers
+                      })
+                      resolve(response)
                     })
-                  }
-                )
+                  })
 
-                req.on('error', reject)
+                  req.on('error', reject)
 
-                if (options?.body) {
-                  if (
-                    typeof options.body === 'object' &&
-                    options.body.constructor?.name === 'FormData'
-                  ) {
-                    // Pipe the FormData directly to the request
-                    ;(options.body as any).pipe(req)
-                  } else {
-                    req.write(options.body)
-                    req.end()
+                  if (options?.body) {
+                    const body = options.body as any
+                    const isFormDataBody =
+                      typeof body === 'object' && typeof body.pipe === 'function'
+                    if (isFormDataBody) {
+                      body.pipe(req)
+                      return
+                    }
+                    if (typeof body === 'string' || Buffer.isBuffer(body)) {
+                      req.write(body)
+                    } else {
+                      req.write(String(body))
+                    }
                   }
-                } else {
                   req.end()
-                }
-              })
+                })
+              }
             }
-          }
-        })
-
-        try {
-          const stream = Readable.from(['streaming payload'])
-          const result = await sdk.r1fs.addFile({
-            file: stream,
-            filename: 'stream.txt',
-            secret: 'node-secret'
           })
-          expect((result as any).cid).toBe('test-cid')
-          server.close((err) => finish(err ?? undefined))
-        } catch (err) {
-          if (settled) return
-          server.close(() => finish(err as Error))
-        }
+
+          try {
+            const stream = Readable.from(['streaming payload'])
+            const result = await sdk.r1fs.addFile({
+              file: stream,
+              filename: 'stream.txt',
+              secret: 'node-secret'
+            })
+            expect((result as any).cid).toBe('test-cid')
+            server.close((err) => {
+              finish(err ?? undefined)
+            })
+          } catch (err) {
+            if (settled) return
+            server.close(() => {
+              finish(err instanceof Error ? err : new Error(String(err)))
+            })
+          }
+        })()
       })
     })
   }, 10000)

@@ -2,14 +2,14 @@ import crossFetch from 'cross-fetch'
 import nock from 'nock'
 import createEdgeSdk from '../index'
 
-const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
+const cstoreBase = process.env.CSTORE_API_URL ?? 'http://localhost:31234'
 const client = createEdgeSdk({
   cstoreUrl: cstoreBase,
   r1fsUrl: 'http://localhost:31235',
   httpAdapter: { fetch: crossFetch as any }
 })
 
-let storedKey = 'e2e-key'
+const storedKey = 'e2e-key'
 
 describe('cstore e2e', () => {
   afterEach(() => {

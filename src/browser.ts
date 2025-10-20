@@ -18,15 +18,19 @@ export interface EdgeSdkOptions {
 
 // Helper function to get environment variables safely
 function getEnvVar(keys: string[]): string | undefined {
-  if (window?.__RATIO1_ENV__) {
-    for (const k of keys) {
-      if (window.__RATIO1_ENV__[k]) return window.__RATIO1_ENV__[k]
+  if (typeof window !== 'undefined') {
+    const env = window.__RATIO1_ENV__
+    if (env) {
+      for (const k of keys) {
+        const value = env?.[k]
+        if (value) return value
+      }
     }
   }
 
-  if (typeof process !== 'undefined' && process.env) {
+  if (typeof process !== 'undefined') {
     for (const k of keys) {
-      const val = process.env[k]
+      const val = process?.env?.[k]
       if (val) return val
     }
   }
