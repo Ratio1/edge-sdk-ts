@@ -1,4 +1,4 @@
-import { BaseResponse } from '../../common/types'
+import { type BaseResponse } from '../../common/types'
 
 export interface CStoreBaseResponse<T = unknown> extends BaseResponse<T> {}
 
@@ -15,9 +15,7 @@ export type CStoreHSetResult = boolean
 
 export type CStoreHGetResult = string
 
-export interface CStoreHGetAllResult {
-  [key: string]: string
-}
+export type CStoreHGetAllResult = Record<string, string>
 
 // Specific response types with proper result typing
 export interface CStoreStatusResponse extends CStoreBaseResponse<CStoreStatusResult> {

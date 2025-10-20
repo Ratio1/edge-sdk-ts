@@ -1,10 +1,15 @@
 {
-  "extends": ["standard-with-typescript"],
+  "root": true,
+  "extends": ["standard-with-typescript", "plugin:prettier/recommended"],
   "parserOptions": {
     "project": "./tsconfig.json"
   },
   "env": {
     "node": true,
     "jest": true
-  }
+  },
+  "rules": {
+    "@typescript-eslint/strict-boolean-expressions": "off"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
 }

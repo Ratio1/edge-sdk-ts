@@ -1,9 +1,9 @@
-import { CStoreHttpClient } from './cstore/httpClient'
-import { R1FSHttpClient } from './r1fs/httpClient'
-import { CStoreService } from './cstore/service'
-import { R1FSService } from './r1fs/service'
 import type { HttpAdapter } from './common/http/adapter'
+import { CStoreHttpClient } from './cstore/httpClient'
+import { CStoreService } from './cstore/service'
 import { ensureProtocol } from './helpers'
+import { R1FSHttpClient } from './r1fs/httpClient'
+import { R1FSService } from './r1fs/service'
 
 export interface EdgeSdkOptions {
   cstoreUrl?: string
@@ -28,7 +28,7 @@ function getEnvVar(keys: string[]): string | undefined {
   }
 
   // Check Node.js environment
-  if (typeof process !== 'undefined' && process.env) {
+  if (process?.env) {
     for (const k of keys) {
       const val = process.env[k]
       if (val) return val
@@ -42,9 +42,11 @@ export class EdgeSdk {
   readonly cstore: CStoreService
   readonly r1fs: R1FSService
 
-  constructor (opts: EdgeSdkOptions = {}) {
-    let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
-    let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
+  constructor(opts: EdgeSdkOptions = {}) {
+    let cstoreUrl =
+      opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
+    let r1fsUrl =
+      opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
     const chainstorePeersStr = opts.chainstorePeers ?? getEnvVar(['EE_CHAINSTORE_PEERS']) ?? []
     cstoreUrl = ensureProtocol(cstoreUrl)
     r1fsUrl = ensureProtocol(r1fsUrl)
@@ -59,9 +61,11 @@ export class EdgeSdk {
 
     let chainstorePeers: string[] = []
     try {
-        chainstorePeers = Array.isArray(chainstorePeersStr) ? chainstorePeersStr : JSON.parse(chainstorePeersStr)
+      chainstorePeers = Array.isArray(chainstorePeersStr)
+        ? chainstorePeersStr
+        : JSON.parse(chainstorePeersStr)
     } catch (e) {
-        console.warn('Failed to parse chainstorePeers, using empty array', e)
+      console.warn('Failed to parse chainstorePeers, using empty array', e)
     }
 
     const cstoreHttp = new CStoreHttpClient(cstoreUrl, verbose, adapter, chainstorePeers)
@@ -72,7 +76,7 @@ export class EdgeSdk {
   }
 }
 
-export default function createEdgeSdk (opts?: EdgeSdkOptions): EdgeSdk {
+export default function createEdgeSdk(opts?: EdgeSdkOptions): EdgeSdk {
   return new EdgeSdk(opts)
 }
 

@@ -1,4 +1,4 @@
-import { BaseResponse } from '../../common/types'
+import { type BaseResponse } from '../../common/types'
 
 export interface R1FSBaseResponse<T = unknown> extends BaseResponse<T> {}
 
@@ -40,10 +40,10 @@ export interface UploadMetadata {
 
 // Interface for the FormData-like object that addFile can re-use (Node form-data package)
 export interface UploadFormData {
-  append(name: string, value: any, options?: any): void
-  get?(name: string): File | Buffer | string | null
-  set?(name: string, value: any, options?: any): void
-  delete?(name: string): void
+  append: (name: string, value: any, options?: any) => void
+  get?: (name: string) => File | Buffer | string | null
+  set?: (name: string, value: any, options?: any) => void
+  delete?: (name: string) => void
 }
 
 export type UploadFileLike = File | Blob | Buffer | NodeJS.ReadableStream

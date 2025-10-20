@@ -1,13 +1,13 @@
 // Example usage of @ratio1/edge-sdk-ts inside a Next.js application
 
-import { createEdgeSdkBrowserClient } from '@ratio1/edge-sdk-ts/browser'
 import createEdgeSdk from '@ratio1/edge-sdk-ts'
+import { createEdgeSdkBrowserClient } from '@ratio1/edge-sdk-ts/browser'
 import { Readable } from 'node:stream'
 
 // -------------------------------------------------------------------------------------
 // Client Components / Browser usage
 // -------------------------------------------------------------------------------------
-export async function clientSideExample (): Promise<void> {
+export async function clientSideExample(): Promise<void> {
   const ratio1 = createEdgeSdkBrowserClient({
     cstoreUrl: process.env.NEXT_PUBLIC_CSTORE_API_URL,
     r1fsUrl: process.env.NEXT_PUBLIC_R1FS_API_URL
@@ -25,7 +25,7 @@ export async function clientSideExample (): Promise<void> {
 // -------------------------------------------------------------------------------------
 // App Router (app/api/upload/route.ts)
 // -------------------------------------------------------------------------------------
-export async function appRouterUploadExample (req: Request): Promise<Response> {
+export async function appRouterUploadExample(req: Request): Promise<Response> {
   const form = await req.formData()
   const file = form.get('file')
 
@@ -58,7 +58,7 @@ export async function appRouterUploadExample (req: Request): Promise<Response> {
 // -------------------------------------------------------------------------------------
 // Pages Router (pages/api/upload.ts)
 // -------------------------------------------------------------------------------------
-export async function pagesApiRouteExample (req: any, res: any): Promise<void> {
+export async function pagesApiRouteExample(req: any, res: any): Promise<void> {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' })
     return

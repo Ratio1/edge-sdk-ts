@@ -1,13 +1,13 @@
-export function getFetch (): typeof fetch {
-  if (typeof globalThis !== 'undefined' && typeof globalThis.fetch !== 'undefined') {
-    return globalThis.fetch.bind(globalThis) as typeof fetch
+export function getFetch(): typeof fetch {
+  if (typeof globalThis?.fetch !== 'undefined') {
+    return globalThis.fetch.bind(globalThis)
   }
   const cf = require('cross-fetch')
   return cf.default || cf
 }
 
-export function getFormData (): typeof FormData {
-  const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined'
+export function getFormData(): typeof FormData {
+  const isBrowser = typeof window?.document !== 'undefined'
 
   if (isBrowser && typeof window.FormData !== 'undefined') {
     return window.FormData

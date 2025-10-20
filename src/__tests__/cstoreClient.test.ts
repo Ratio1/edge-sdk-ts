@@ -1,10 +1,14 @@
+import crossFetch from 'cross-fetch'
 import nock from 'nock'
 import createEdgeSdk from '../index'
-import crossFetch from 'cross-fetch'
 
 describe('CStoreClient', () => {
   const baseUrl = 'http://localhost:31234'
-  const ratio1 = createEdgeSdk({ cstoreUrl: baseUrl, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
+  const ratio1 = createEdgeSdk({
+    cstoreUrl: baseUrl,
+    r1fsUrl: 'http://localhost:31235',
+    httpAdapter: { fetch: crossFetch as any }
+  })
 
   afterEach(() => {
     nock.cleanAll()

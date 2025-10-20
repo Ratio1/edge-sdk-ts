@@ -1,10 +1,15 @@
-import createEdgeSdk from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
 import { Readable } from 'stream'
+import createEdgeSdk from '../index'
 
 const r1fsBase = process.env.R1FS_API_URL || 'http://localhost:31235'
-const client = createEdgeSdk({ r1fsUrl: r1fsBase, cstoreUrl: 'http://localhost:31234', verbose: true, httpAdapter: { fetch: crossFetch as any } })
+const client = createEdgeSdk({
+  r1fsUrl: r1fsBase,
+  cstoreUrl: 'http://localhost:31234',
+  verbose: true,
+  httpAdapter: { fetch: crossFetch as any }
+})
 
 let cidFile: string
 let cidB64: string
@@ -17,9 +22,16 @@ describe('r1fs e2e', () => {
     nock.cleanAll()
   })
   it('get_status works', async () => {
-    nock(r1fsBase)
-      .get('/get_status')
-      .reply(200, { result: {}, server_node_addr: '', evm_network: '', ee_node_alias: '', ee_node_address: '', ee_node_eth_address: '', ee_node_network: '', ee_node_ver: '' })
+    nock(r1fsBase).get('/get_status').reply(200, {
+      result: {},
+      server_node_addr: '',
+      evm_network: '',
+      ee_node_alias: '',
+      ee_node_address: '',
+      ee_node_eth_address: '',
+      ee_node_network: '',
+      ee_node_ver: ''
+    })
     const res = await client.r1fs.getStatus()
     expect(res).toBeDefined()
   })
@@ -42,11 +54,19 @@ describe('r1fs e2e', () => {
   it('get_file downloads data', async () => {
     nock(r1fsBase)
       .get('/get_file')
-      .query({ cid: "QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp", secret: "test-secret" })
-      .reply(200, { result: { file_path: "/path/to/file", meta: { file: "/path/to/file", filename: "test.txt" } } })
-    const res = await client.r1fs.getFile({ cid: "QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp", secret: "test-secret" })
-    expect(res.file_path).toBe("/path/to/file")
-    expect(res.meta?.filename).toBe("test.txt")
+      .query({ cid: 'QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp', secret: 'test-secret' })
+      .reply(200, {
+        result: {
+          file_path: '/path/to/file',
+          meta: { file: '/path/to/file', filename: 'test.txt' }
+        }
+      })
+    const res = await client.r1fs.getFile({
+      cid: 'QmTmkNsKFDH1xrNF2Ud4Utdx2XFjKoSfqyRjbQFF7E56sp',
+      secret: 'test-secret'
+    })
+    expect(res.file_path).toBe('/path/to/file')
+    expect(res.meta?.filename).toBe('test.txt')
   })
 
   it('add_yaml stores yaml data', async () => {
@@ -54,7 +74,11 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .post('/add_yaml')
       .reply(200, { result: { cid: 'yaml-cid-123' } })
-    const res = await client.r1fs.addYaml({ data: testData, fn: 'test.yaml', secret: 'test-secret' })
+    const res = await client.r1fs.addYaml({
+      data: testData,
+      fn: 'test.yaml',
+      secret: 'test-secret'
+    })
     expect((res as any).cid).toBe('yaml-cid-123')
   })
 
@@ -73,7 +97,12 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .post('/add_json')
       .reply(200, { result: { cid: 'json-cid-123' } })
-    const res = await client.r1fs.addJson({ data: testData, fn: 'test.json', secret: 'test-secret', nonce: 1 })
+    const res = await client.r1fs.addJson({
+      data: testData,
+      fn: 'test.json',
+      secret: 'test-secret',
+      nonce: 1
+    })
     expect((res as any).cid).toBe('json-cid-123')
   })
 
@@ -82,7 +111,12 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .post('/add_pickle')
       .reply(200, { result: { cid: 'pickle-cid-123' } })
-    const res = await client.r1fs.addPickle({ data: testData, fn: 'test.pkl', secret: 'test-secret', nonce: 1 })
+    const res = await client.r1fs.addPickle({
+      data: testData,
+      fn: 'test.pkl',
+      secret: 'test-secret',
+      nonce: 1
+    })
     expect((res as any).cid).toBe('pickle-cid-123')
   })
 
@@ -91,7 +125,12 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .post('/calculate_json_cid')
       .reply(200, { result: { cid: 'calculated-json-cid-123' } })
-    const res = await client.r1fs.calculateJsonCid({ data: testData, nonce: 1, fn: 'test.json', secret: 'test-secret' })
+    const res = await client.r1fs.calculateJsonCid({
+      data: testData,
+      nonce: 1,
+      fn: 'test.json',
+      secret: 'test-secret'
+    })
     expect((res as any).cid).toBe('calculated-json-cid-123')
   })
 
@@ -100,7 +139,12 @@ describe('r1fs e2e', () => {
     nock(r1fsBase)
       .post('/calculate_pickle_cid')
       .reply(200, { result: { cid: 'calculated-pickle-cid-123' } })
-    const res = await client.r1fs.calculatePickleCid({ data: testData, nonce: 1, fn: 'test.pkl', secret: 'test-secret' })
+    const res = await client.r1fs.calculatePickleCid({
+      data: testData,
+      nonce: 1,
+      fn: 'test.pkl',
+      secret: 'test-secret'
+    })
     expect((res as any).cid).toBe('calculated-pickle-cid-123')
   })
   //

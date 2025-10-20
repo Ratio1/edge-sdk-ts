@@ -41,22 +41,22 @@ describe('Browser Client', () => {
       get: (name: string) => {
         switch (name) {
           case 'file':
-            return Buffer.from('test content');
+            return Buffer.from('test content')
           case 'filename':
-            return 'test.txt';
+            return 'test.txt'
           case 'secret':
-            return 'test-secret';
+            return 'test-secret'
           default:
-            return null;
+            return null
         }
       }
-    };
+    }
 
     // This should not throw an error - Buffer should be converted to Blob
     expect(() => {
       // We're not actually calling the method, just testing that the ratio1 can handle it
-      const r1fsClient = ratio1.r1fs;
-      expect(r1fsClient).toBeDefined();
-    }).not.toThrow();
+      const r1fsClient = ratio1.r1fs
+      expect(r1fsClient).toBeDefined()
+    }).not.toThrow()
   })
 })

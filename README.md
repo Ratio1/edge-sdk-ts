@@ -7,15 +7,15 @@ A comprehensive SDK for interacting with Ratio1 Edge Node services including **C
 
 ## Features
 
--   🔄 **Universal Compatibility**: Works in both Node.js and browser environments
--   🚀 **SSR Support**: Full Next.js Server-Side Rendering compatibility
--   📦 **Optimized Bundles**: Separate builds for Node.js and browser with minimal bundle size
--   🔧 **TypeScript Support**: Full TypeScript definitions included
--   🌐 **Environment Configuration**: Flexible configuration via environment variables or direct options
--   🛡️ **Error Handling**: Comprehensive error handling with detailed error messages
--   📁 **File Operations**: Complete file upload/download capabilities with base64 support
--   🔌 **Pluggable HTTP Layer**: Provide custom `fetch` and `FormData` implementations
--   🌐 **Protocol Flexibility**: URLs without a scheme automatically default to `http://`
+- 🔄 **Universal Compatibility**: Works in both Node.js and browser environments
+- 🚀 **SSR Support**: Full Next.js Server-Side Rendering compatibility
+- 📦 **Optimized Bundles**: Separate builds for Node.js and browser with minimal bundle size
+- 🔧 **TypeScript Support**: Full TypeScript definitions included
+- 🌐 **Environment Configuration**: Flexible configuration via environment variables or direct options
+- 🛡️ **Error Handling**: Comprehensive error handling with detailed error messages
+- 📁 **File Operations**: Complete file upload/download capabilities with base64 support
+- 🔌 **Pluggable HTTP Layer**: Provide custom `fetch` and `FormData` implementations
+- 🌐 **Protocol Flexibility**: URLs without a scheme automatically default to `http://`
 
 ## Installation
 
@@ -25,8 +25,8 @@ npm install @ratio1/edge-sdk-ts
 
 The SDK exports two factory functions:
 
--   `createEdgeSdk` for Node.js environments
--   `createEdgeSdkBrowserClient` for browsers or frameworks like Next.js
+- `createEdgeSdk` for Node.js environments
+- `createEdgeSdkBrowserClient` for browsers or frameworks like Next.js
 
 Both produce the same API surface so you can share code between environments.
 
@@ -35,40 +35,40 @@ Both produce the same API surface so you can share code between environments.
 ### Node.js Environment
 
 ```typescript
-import createEdgeSdk from "@ratio1/edge-sdk-ts";
+import createEdgeSdk from '@ratio1/edge-sdk-ts'
 
-const ratio1 = createEdgeSdk();
+const ratio1 = createEdgeSdk()
 
 // Store a value (values must be stringified JSON)
 await ratio1.cstore.setValue({
-	key: "user:123:preferences",
-	value: JSON.stringify({ theme: "dark", language: "en" }),
-});
+  key: 'user:123:preferences',
+  value: JSON.stringify({ theme: 'dark', language: 'en' })
+})
 
 // Retrieve the value
 const result = await ratio1.cstore.getValue({
-	key: "user:123:preferences",
-});
-console.log(JSON.parse(result.result)); // { theme: 'dark', language: 'en' }
+  key: 'user:123:preferences'
+})
+console.log(JSON.parse(result.result)) // { theme: 'dark', language: 'en' }
 ```
 
 ### Browser Environment (Next.js, React, etc.)
 
 ```typescript
-import { createEdgeSdkBrowserClient } from "@ratio1/edge-sdk-ts/browser";
+import { createEdgeSdkBrowserClient } from '@ratio1/edge-sdk-ts/browser'
 
-const ratio1 = createEdgeSdkBrowserClient();
+const ratio1 = createEdgeSdkBrowserClient()
 
 // Use the same API as Node.js
-const status = await ratio1.cstore.getStatus();
+const status = await ratio1.cstore.getStatus()
 ```
 
 Both creation functions accept the same options. Use the `verbose` flag to enable debug logging.
 
 ```typescript
 const ratio1 = createEdgeSdk({
-	verbose: true,
-});
+  verbose: true
+})
 ```
 
 The SDK also lets you inject a custom `fetch` implementation and `FormData` constructor if needed.
@@ -92,9 +92,9 @@ export EE_R1FS_API_URL=http://localhost:31235
 Run in your application:
 
 ```typescript
-import { createEdgeSdkBrowserClient } from "@ratio1/edge-sdk-ts/browser";
+import { createEdgeSdkBrowserClient } from '@ratio1/edge-sdk-ts/browser'
 
-const ratio1 = createEdgeSdkBrowserClient();
+const ratio1 = createEdgeSdkBrowserClient()
 ```
 
 ## API Reference
@@ -109,20 +109,20 @@ CStore provides a distributed key-value store with hash operations.
 
 ```typescript
 // Get service status
-const status = await ratio1.cstore.getStatus();
+const status = await ratio1.cstore.getStatus()
 // Returns: { success: true, result: true, keys?: string[] }
 
 // Set a value (values must be stringified JSON)
 await ratio1.cstore.setValue({
-	key: "my-key",
-	value: JSON.stringify("my-value"),
-});
+  key: 'my-key',
+  value: JSON.stringify('my-value')
+})
 // Returns: { success: true, result: true }
 
 // Get a value
 const result = await ratio1.cstore.getValue({
-	key: "my-key",
-});
+  key: 'my-key'
+})
 // Returns: { success: true, result: '"my-value"' }
 // Note: result is a JSON string, parse it to get the actual value
 ```
@@ -132,23 +132,23 @@ const result = await ratio1.cstore.getValue({
 ```typescript
 // Set a hash field (values must be stringified JSON)
 await ratio1.cstore.hset({
-	hkey: "user:123",
-	key: "name",
-	value: JSON.stringify("John Doe"),
-});
+  hkey: 'user:123',
+  key: 'name',
+  value: JSON.stringify('John Doe')
+})
 
 // Get a hash field
 const name = await ratio1.cstore.hget({
-	hkey: "user:123",
-	key: "name",
-});
+  hkey: 'user:123',
+  key: 'name'
+})
 // Returns: { success: true, result: '"John Doe"' }
 // Note: result is a JSON string, parse it to get the actual value
 
 // Get all hash fields
 const allFields = await ratio1.cstore.hgetall({
-	hkey: "user:123",
-});
+  hkey: 'user:123'
+})
 // Returns: { success: true, result: { keys: ['name', 'email', 'age'] } }
 ```
 
@@ -157,42 +157,42 @@ const allFields = await ratio1.cstore.hgetall({
 ```typescript
 // Store complex objects (must be stringified)
 await ratio1.cstore.setValue({
-	key: "user:123:profile",
-	value: JSON.stringify({
-		name: "John Doe",
-		email: "john@example.com",
-		preferences: {
-			theme: "dark",
-			notifications: true,
-		},
-	}),
-});
+  key: 'user:123:profile',
+  value: JSON.stringify({
+    name: 'John Doe',
+    email: 'john@example.com',
+    preferences: {
+      theme: 'dark',
+      notifications: true
+    }
+  })
+})
 
 // Store arrays (must be stringified)
 await ratio1.cstore.setValue({
-	key: "user:123:posts",
-	value: JSON.stringify(["post1", "post2", "post3"]),
-});
+  key: 'user:123:posts',
+  value: JSON.stringify(['post1', 'post2', 'post3'])
+})
 
 // Hash operations for user data (values must be stringified)
 await ratio1.cstore.hset({
-	hkey: "user:123",
-	key: "name",
-	value: JSON.stringify("John"),
-});
+  hkey: 'user:123',
+  key: 'name',
+  value: JSON.stringify('John')
+})
 await ratio1.cstore.hset({
-	hkey: "user:123",
-	key: "email",
-	value: JSON.stringify("john@example.com"),
-});
+  hkey: 'user:123',
+  key: 'email',
+  value: JSON.stringify('john@example.com')
+})
 await ratio1.cstore.hset({
-	hkey: "user:123",
-	key: "age",
-	value: JSON.stringify(30),
-});
+  hkey: 'user:123',
+  key: 'age',
+  value: JSON.stringify(30)
+})
 
 // Retrieve all user data
-const userData = await ratio1.cstore.hgetall({ hkey: "user:123" });
+const userData = await ratio1.cstore.hgetall({ hkey: 'user:123' })
 ```
 
 ### R1FS Client
@@ -203,74 +203,71 @@ R1FS provides a distributed file system with upload and download capabilities.
 
 ```typescript
 // Upload a file using FormData (browser)
-const fileInput = document.getElementById("file") as HTMLInputElement;
-const file = fileInput.files[0];
+const fileInput = document.getElementById('file') as HTMLInputElement
+const file = fileInput.files[0]
 
-const formData = new FormData();
-formData.append("file", file);
-formData.append("filename", file.name);
-formData.append("secret", "optional-secret-key");
+const formData = new FormData()
+formData.append('file', file)
+formData.append('filename', file.name)
+formData.append('secret', 'optional-secret-key')
 
-const uploadResult = await ratio1.r1fs.addFile({ formData });
+const uploadResult = await ratio1.r1fs.addFile({ formData })
 // Returns: { success: true, result: { message: 'File uploaded', cid: 'QmHash...' } }
 
 // Upload using base64 (works in both Node.js and browser)
-const base64Data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...";
+const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'
 const uploadResult = await ratio1.r1fs.addFileBase64({
-	file_base64_str: base64Data,
-	filename: "image.png",
-	secret: "optional-secret-key",
-});
+  file_base64_str: base64Data,
+  filename: 'image.png',
+  secret: 'optional-secret-key'
+})
 ```
 
 #### Streaming Uploads (Node.js & Next.js)
 
 ```typescript
-import fs from "node:fs";
-import createEdgeSdk from "@ratio1/edge-sdk-ts";
+import fs from 'node:fs'
+import createEdgeSdk from '@ratio1/edge-sdk-ts'
 
-const ratio1 = createEdgeSdk();
+const ratio1 = createEdgeSdk()
 
-const stream = fs.createReadStream("/tmp/report.csv");
+const stream = fs.createReadStream('/tmp/report.csv')
 
 const upload = await ratio1.r1fs.addFile({
-	file: stream,
-	filename: "report.csv",
-	contentType: "text/csv",
-	secret: process.env.R1FS_SECRET,
-});
+  file: stream,
+  filename: 'report.csv',
+  contentType: 'text/csv',
+  secret: process.env.R1FS_SECRET
+})
 
-console.log(upload.cid);
+console.log(upload.cid)
 ```
 
 ```typescript
 // app/api/upload/route.ts (Next.js App Router)
-import { NextRequest, NextResponse } from "next/server";
-import { Readable } from "node:stream";
-import createEdgeSdk from "@ratio1/edge-sdk-ts";
+import { NextRequest, NextResponse } from 'next/server'
+import { Readable } from 'node:stream'
+import createEdgeSdk from '@ratio1/edge-sdk-ts'
 
 export async function POST(req: NextRequest) {
-	const form = await req.formData();
-	const file = form.get("file");
+  const form = await req.formData()
+  const file = form.get('file')
 
-	if (!(file instanceof File)) {
-		return NextResponse.json(
-			{ error: "file field missing" },
-			{ status: 400 }
-		);
-	}
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: 'file field missing' }, { status: 400 })
+  }
 
-	const ratio1 = createEdgeSdk();
-	const readable = Readable.fromWeb(file.stream());
+  const ratio1 = createEdgeSdk()
+  const readable = Readable.fromWeb(file.stream())
 
-	const result = await ratio1.r1fs.addFile({
-		file: readable,
-		filename: file.name,
-		contentType: file.type,
-		secret: form.get("secret")?.toString(),
-	});
+  const result = await ratio1.r1fs.addFile({
+    file: readable,
+    filename: file.name,
+    contentType: file.type,
+    secret: form.get('secret')?.toString()
+  })
 
-	return NextResponse.json({ cid: result.cid });
+  return NextResponse.json({ cid: result.cid })
 }
 ```
 
@@ -279,23 +276,23 @@ export async function POST(req: NextRequest) {
 ```typescript
 // Download file as blob/response
 const fileResponse = await ratio1.r1fs.getFile({
-	cid: "QmHash...",
-	secret: "optional-secret-key", // if file was uploaded with secret
-});
+  cid: 'QmHash...',
+  secret: 'optional-secret-key' // if file was uploaded with secret
+})
 
 // For browser: create download link
-const blob = await fileResponse.blob();
-const url = URL.createObjectURL(blob);
-const a = document.createElement("a");
-a.href = url;
-a.download = "filename.ext";
-a.click();
+const blob = await fileResponse.blob()
+const url = URL.createObjectURL(blob)
+const a = document.createElement('a')
+a.href = url
+a.download = 'filename.ext'
+a.click()
 
 // Download as base64
 const base64Result = await ratio1.r1fs.getFileBase64({
-	cid: "QmHash...",
-	secret: "optional-secret-key",
-});
+  cid: 'QmHash...',
+  secret: 'optional-secret-key'
+})
 // Returns: { file_base64_str: 'data:image/png;base64,...', filename: 'image.png' }
 ```
 
@@ -303,7 +300,7 @@ const base64Result = await ratio1.r1fs.getFileBase64({
 
 ```typescript
 // Check R1FS service status
-const status = await ratio1.r1fs.getStatus();
+const status = await ratio1.r1fs.getStatus()
 // Returns: { EE_ID: 'edge-node-id', ... }
 ```
 
@@ -312,27 +309,27 @@ const status = await ratio1.r1fs.getStatus();
 ```typescript
 // Upload multiple files
 async function uploadFiles(files: File[]) {
-	const uploadPromises = files.map(async (file) => {
-		const formData = new FormData();
-		formData.append("file", file);
-		formData.append("filename", file.name);
+  const uploadPromises = files.map(async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('filename', file.name)
 
-		return await ratio1.r1fs.addFile({ formData });
-	});
+    return await ratio1.r1fs.addFile({ formData })
+  })
 
-	const results = await Promise.all(uploadPromises);
-	return results.map((r) => r.result.cid);
+  const results = await Promise.all(uploadPromises)
+  return results.map((r) => r.result.cid)
 }
 
 // Download and display image
 async function displayImage(cid: string) {
-	const response = await ratio1.r1fs.getFile({ cid });
-	const blob = await response.blob();
-	const url = URL.createObjectURL(blob);
+  const response = await ratio1.r1fs.getFile({ cid })
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
 
-	const img = document.createElement("img");
-	img.src = url;
-	document.body.appendChild(img);
+  const img = document.createElement('img')
+  img.src = url
+  document.body.appendChild(img)
 }
 ```
 
@@ -342,16 +339,16 @@ The SDK provides comprehensive error handling:
 
 ```typescript
 try {
-	const result = await ratio1.cstore.getValue({ key: "non-existent-key" });
-	console.log(result.result);
+  const result = await ratio1.cstore.getValue({ key: 'non-existent-key' })
+  console.log(result.result)
 } catch (error) {
-	if (error.message.includes("404")) {
-		console.log("Key not found");
-	} else if (error.message.includes("500")) {
-		console.log("Server error");
-	} else {
-		console.log("Network error:", error.message);
-	}
+  if (error.message.includes('404')) {
+    console.log('Key not found')
+  } else if (error.message.includes('500')) {
+    console.log('Server error')
+  } else {
+    console.log('Network error:', error.message)
+  }
 }
 ```
 
@@ -370,10 +367,10 @@ The package is marked as `sideEffects: false`, enabling optimal tree shaking:
 
 ```typescript
 // Only CStore functionality will be included
-import { CStoreClient } from "@ratio1/edge-sdk-ts";
+import { CStoreClient } from '@ratio1/edge-sdk-ts'
 
 // Only R1FS functionality will be included
-import { R1FSClient } from "@ratio1/edge-sdk-ts";
+import { R1FSClient } from '@ratio1/edge-sdk-ts'
 ```
 
 ## Development
@@ -420,30 +417,30 @@ npm run test:e2e:r1fs
 
 ```typescript
 // pages/api/upload.ts
-import createEdgeSdk from "@ratio1/edge-sdk-ts";
+import createEdgeSdk from '@ratio1/edge-sdk-ts'
 
 export default async function handler(req, res) {
-	if (req.method !== "POST") {
-		return res.status(405).json({ error: "Method not allowed" });
-	}
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
 
-	const ratio1 = createEdgeSdk();
+  const ratio1 = createEdgeSdk()
 
-	try {
-		// Store metadata (must be stringified)
-		await ratio1.cstore.setValue({
-			key: `upload:${Date.now()}`,
-			value: JSON.stringify({
-				filename: req.body.filename,
-				size: req.body.size,
-				uploadedAt: new Date().toISOString(),
-			}),
-		});
+  try {
+    // Store metadata (must be stringified)
+    await ratio1.cstore.setValue({
+      key: `upload:${Date.now()}`,
+      value: JSON.stringify({
+        filename: req.body.filename,
+        size: req.body.size,
+        uploadedAt: new Date().toISOString()
+      })
+    })
 
-		res.status(200).json({ success: true });
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
+    res.status(200).json({ success: true })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
 }
 ```
 
@@ -508,10 +505,10 @@ export function FileUpload() {
 
 ## Browser Compatibility
 
--   **Modern Browsers**: Chrome 60+, Firefox 55+, Safari 11+, Edge 79+
--   **Node.js**: 14.0+
--   **Next.js**: 12.0+
--   **React**: 16.8+
+- **Modern Browsers**: Chrome 60+, Firefox 55+, Safari 11+, Edge 79+
+- **Node.js**: 14.0+
+- **Next.js**: 12.0+
+- **React**: 16.8+
 
 ## License
 
@@ -527,5 +524,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
--   📖 **Documentation**: This README and inline code comments
--   🐛 **Issues**: [GitHub Issues](https://github.com/Ratio1/edge-sdk-ts/issues)
+- 📖 **Documentation**: This README and inline code comments
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Ratio1/edge-sdk-ts/issues)

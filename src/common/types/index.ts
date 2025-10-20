@@ -9,4 +9,4 @@ export interface BaseResponse<T = unknown> {
   ee_node_network: string
   ee_node_ver: string
   [key: string]: any
-} 
+}

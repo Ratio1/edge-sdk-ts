@@ -1,10 +1,10 @@
 // Browser-specific entry point for Next.js SSR compatibility
-import { CStoreHttpClient } from './cstore/httpClient'
-import { R1FSHttpClient } from './r1fs/httpClient'
-import { CStoreService } from './cstore/service'
-import { R1FSService } from './r1fs/service'
 import type { HttpAdapter } from './common/http/adapter'
+import { CStoreHttpClient } from './cstore/httpClient'
+import { CStoreService } from './cstore/service'
 import { ensureProtocol } from './helpers'
+import { R1FSHttpClient } from './r1fs/httpClient'
+import { R1FSService } from './r1fs/service'
 
 export interface EdgeSdkOptions {
   cstoreUrl?: string
@@ -18,11 +18,19 @@ export interface EdgeSdkOptions {
 
 // Helper function to get environment variables safely
 function getEnvVar(keys: string[]): string | undefined {
-  if (typeof window !== 'undefined' && window.__RATIO1_ENV__) {
+  if (window?.__RATIO1_ENV__) {
     for (const k of keys) {
       if (window.__RATIO1_ENV__[k]) return window.__RATIO1_ENV__[k]
     }
   }
+
+  if (typeof process !== 'undefined' && process.env) {
+    for (const k of keys) {
+      const val = process.env[k]
+      if (val) return val
+    }
+  }
+
   return undefined
 }
 
@@ -30,9 +38,11 @@ export class EdgeSdk {
   readonly cstore: CStoreService
   readonly r1fs: R1FSService
 
-  constructor (opts: EdgeSdkOptions = {}) {
-    let cstoreUrl = opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
-    let r1fsUrl = opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
+  constructor(opts: EdgeSdkOptions = {}) {
+    let cstoreUrl =
+      opts.cstoreUrl ?? getEnvVar(['CSTORE_API_URL', 'EE_CHAINSTORE_API_URL']) ?? 'localhost:31234'
+    let r1fsUrl =
+      opts.r1fsUrl ?? getEnvVar(['R1FS_API_URL', 'EE_R1FS_API_URL']) ?? 'localhost:31235'
     const chainstorePeersStr = opts.chainstorePeers ?? getEnvVar(['EE_CHAINSTORE_PEERS']) ?? []
     cstoreUrl = ensureProtocol(cstoreUrl)
     r1fsUrl = ensureProtocol(r1fsUrl)
@@ -43,7 +53,9 @@ export class EdgeSdk {
 
     let chainstorePeers: string[] = []
     try {
-      chainstorePeers = Array.isArray(chainstorePeersStr) ? chainstorePeersStr : JSON.parse(chainstorePeersStr)
+      chainstorePeers = Array.isArray(chainstorePeersStr)
+        ? chainstorePeersStr
+        : JSON.parse(chainstorePeersStr)
     } catch (e) {
       console.warn('Failed to parse chainstorePeers, using empty array', e)
     }

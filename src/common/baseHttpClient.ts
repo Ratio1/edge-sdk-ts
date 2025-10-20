@@ -8,13 +8,13 @@ export interface RequestOptions {
 }
 
 export class BaseHttpClient {
-  constructor (
+  constructor(
     protected readonly baseUrl: string,
     protected readonly verbose = false,
     private readonly http: HttpAdapter = createDefaultHttpAdapter()
   ) {}
 
-  protected async request (endpoint: string, options: RequestOptions): Promise<Response> {
+  protected async request(endpoint: string, options: RequestOptions): Promise<Response> {
     const url = `${this.baseUrl}${endpoint}`
     const start = Date.now()
     if (this.verbose) {
@@ -27,14 +27,17 @@ export class BaseHttpClient {
       console.debug('[edge-sdk-ts] response', { url, status: res.status, duration })
     }
     if (!res.ok) {
-      const err = new Error(`Request failed with status ${res.status}`);
-      (err as any).response = res
+      const err = new Error(`Request failed with status ${res.status}`)
+      ;(err as any).response = res
       throw err
     }
     return res
   }
 
-  protected async parseResponse<T>(res: Response, opts?: { fullResponse?: boolean }): Promise<T | BaseResponse<T>> {
+  protected async parseResponse<T>(
+    res: Response,
+    opts?: { fullResponse?: boolean }
+  ): Promise<T | BaseResponse<T>> {
     let data: BaseResponse<T>
     try {
       data = await res.json()
@@ -43,13 +46,14 @@ export class BaseHttpClient {
       ;(e as any).cause = err
       throw e
     }
-    return opts?.fullResponse ? data : data.result
+    return (opts?.fullResponse ?? false) ? data : data.result
   }
 
-  protected buildQuery (params: Record<string, any>): string {
+  protected buildQuery(params: Record<string, any>): string {
     const sp = new URLSearchParams()
     for (const [k, v] of Object.entries(params)) {
-      if (v !== undefined && v !== null) sp.append(k, typeof v === 'object' ? JSON.stringify(v) : String(v))
+      if (v !== undefined && v !== null)
+        sp.append(k, typeof v === 'object' ? JSON.stringify(v) : String(v))
     }
     return sp.toString()
   }

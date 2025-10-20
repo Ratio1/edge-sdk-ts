@@ -1,9 +1,13 @@
-import createEdgeSdk from '../index'
 import crossFetch from 'cross-fetch'
 import nock from 'nock'
+import createEdgeSdk from '../index'
 
 const cstoreBase = process.env.CSTORE_API_URL || 'http://localhost:31234'
-const client = createEdgeSdk({ cstoreUrl: cstoreBase, r1fsUrl: 'http://localhost:31235', httpAdapter: { fetch: crossFetch as any } })
+const client = createEdgeSdk({
+  cstoreUrl: cstoreBase,
+  r1fsUrl: 'http://localhost:31235',
+  httpAdapter: { fetch: crossFetch as any }
+})
 
 let storedKey = 'e2e-key'
 
@@ -12,9 +16,7 @@ describe('cstore e2e', () => {
     nock.cleanAll()
   })
   it('get_status returns info', async () => {
-    nock(cstoreBase)
-      .get('/get_status')
-      .reply(200, { result: {}, ee_node_alias: 'node' })
+    nock(cstoreBase).get('/get_status').reply(200, { result: {}, ee_node_alias: 'node' })
     const status = await client.cstore.getStatus({ fullResponse: true })
     expect((status as any).ee_node_alias).toBeDefined()
   })
@@ -28,12 +30,9 @@ describe('cstore e2e', () => {
   })
 
   it('get_value returns the stored value', async () => {
-    nock(cstoreBase)
-      .get('/get')
-      .query({ key: storedKey })
-      .reply(200, { result: '1' })
+    nock(cstoreBase).get('/get').query({ key: storedKey }).reply(200, { result: '1' })
     const res = await client.cstore.getValue({ key: storedKey })
-    expect(res).toBe("1")
+    expect(res).toBe('1')
   })
 
   it('hset stores a hash entry', async () => {
