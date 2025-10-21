@@ -1,0 +1,67 @@
+name: Publish Edge Client Alpha
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-publish-alpha:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # - name: Run tests
+      #   run: npm test
+
+      - name: Build package
+        run: npm run build
+
+      - name: Prepare alpha prerelease version
+        run: npm version prerelease --preid=alpha --no-git-tag-version
+
+      - name: Check package.json
+        run: |
+          if [ ! -f package.json ]; then
+            echo "Error: package.json not found"
+            exit 1
+          fi
+
+          # Check if package name exists
+          if ! npm pkg get name > /dev/null 2>&1; then
+            echo "Error: package name not found in package.json"
+            exit 1
+          fi
+
+          # Check if version exists and includes alpha preid
+          VERSION=$(npm pkg get version | tr -d '"')
+          if [ -z "$VERSION" ]; then
+            echo "Error: package version not found in package.json"
+            exit 1
+          fi
+
+          if [[ "$VERSION" != *"alpha"* ]]; then
+            echo "Error: expected alpha prerelease version, got $VERSION"
+            exit 1
+          fi
+
+      - name: Dry run publish (alpha)
+        run: npm publish --dry-run --access public --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish alpha version to npm
+        run: npm publish --access public --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
