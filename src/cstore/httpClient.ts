@@ -1,8 +1,7 @@
 import {
   BaseHttpClient,
   type FullResponseOptions,
-  type ResponseOptions,
-  type ResultOnlyOptions
+  type ResponseOptions
 } from '../common/baseHttpClient'
 import type { HttpAdapter } from '../common/http/adapter'
 import {
@@ -37,91 +36,63 @@ export class CStoreHttpClient extends BaseHttpClient {
     this.chainstorePeers = chainstorePeers
   }
 
-  async getStatus(opts: FullResponseOptions): Promise<CStoreStatusResponse>
-  async getStatus(opts?: ResultOnlyOptions): Promise<CStoreStatusResult>
-  async getStatus(opts?: ResponseOptions): Promise<CStoreStatusResult | CStoreStatusResponse> {
+  async getStatus<R extends ResponseOptions | undefined = undefined>(
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreStatusResponse : CStoreStatusResult> {
     const res = await this.request('/get_status', { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreStatusResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreStatusResult>(res, opts)
+    return await this.parseResponse<CStoreStatusResult, R>(res, opts)
   }
 
-  async setValue(request: SetValueRequest, opts: FullResponseOptions): Promise<CStoreSetResponse>
-  async setValue(request: SetValueRequest, opts?: ResultOnlyOptions): Promise<CStoreSetResult>
-  async setValue(
+  async setValue<R extends ResponseOptions | undefined = undefined>(
     { key, value }: SetValueRequest,
-    opts?: ResponseOptions
-  ): Promise<CStoreSetResult | CStoreSetResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreSetResponse : CStoreSetResult> {
     const chainstorePeers = this.chainstorePeers.length > 0 ? this.chainstorePeers : []
     const res = await this.request('/set', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key, value: String(value), chainstore_peers: chainstorePeers })
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreSetResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreSetResult>(res, opts)
+    return await this.parseResponse<CStoreSetResult, R>(res, opts)
   }
 
-  async getValue(request: GetValueRequest, opts: FullResponseOptions): Promise<CStoreGetResponse>
-  async getValue(request: GetValueRequest, opts?: ResultOnlyOptions): Promise<CStoreGetResult>
-  async getValue(
+  async getValue<R extends ResponseOptions | undefined = undefined>(
     { key }: GetValueRequest,
-    opts?: ResponseOptions
-  ): Promise<CStoreGetResult | CStoreGetResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreGetResponse : CStoreGetResult> {
     const qs = this.buildQuery({ key })
     const res = await this.request(`/get?${qs}`, { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreGetResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreGetResult>(res, opts)
+    return await this.parseResponse<CStoreGetResult, R>(res, opts)
   }
 
-  async hset(request: HSetRequest, opts: FullResponseOptions): Promise<CStoreHSetResponse>
-  async hset(request: HSetRequest, opts?: ResultOnlyOptions): Promise<CStoreHSetResult>
-  async hset(
+  async hset<R extends ResponseOptions | undefined = undefined>(
     { hkey, key, value }: HSetRequest,
-    opts?: ResponseOptions
-  ): Promise<CStoreHSetResult | CStoreHSetResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreHSetResponse : CStoreHSetResult> {
     const chainstorePeers = this.chainstorePeers.length > 0 ? this.chainstorePeers : []
     const res = await this.request('/hset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hkey, key, value: String(value), chainstore_peers: chainstorePeers })
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreHSetResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreHSetResult>(res, opts)
+    return await this.parseResponse<CStoreHSetResult, R>(res, opts)
   }
 
-  async hget(request: HGetRequest, opts: FullResponseOptions): Promise<CStoreHGetResponse>
-  async hget(request: HGetRequest, opts?: ResultOnlyOptions): Promise<CStoreHGetResult>
-  async hget(
+  async hget<R extends ResponseOptions | undefined = undefined>(
     { hkey, key }: HGetRequest,
-    opts?: ResponseOptions
-  ): Promise<CStoreHGetResult | CStoreHGetResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreHGetResponse : CStoreHGetResult> {
     const qs = this.buildQuery({ hkey, key })
     const res = await this.request(`/hget?${qs}`, { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreHGetResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreHGetResult>(res, opts)
+    return await this.parseResponse<CStoreHGetResult, R>(res, opts)
   }
 
-  async hgetall(request: HGetAllRequest, opts: FullResponseOptions): Promise<CStoreHGetAllResponse>
-  async hgetall(request: HGetAllRequest, opts?: ResultOnlyOptions): Promise<CStoreHGetAllResult>
-  async hgetall(
+  async hgetall<R extends ResponseOptions | undefined = undefined>(
     { hkey }: HGetAllRequest,
-    opts?: ResponseOptions
-  ): Promise<CStoreHGetAllResult | CStoreHGetAllResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? CStoreHGetAllResponse : CStoreHGetAllResult> {
     const qs = this.buildQuery({ hkey })
     const res = await this.request(`/hgetall?${qs}`, { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<CStoreHGetAllResult>(res, opts)
-    }
-    return await this.parseResponse<CStoreHGetAllResult>(res, opts)
+    return await this.parseResponse<CStoreHGetAllResult, R>(res, opts)
   }
 }

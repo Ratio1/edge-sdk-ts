@@ -42,15 +42,10 @@ export class BaseHttpClient {
     return res
   }
 
-  protected async parseResponse<T>(
+  protected async parseResponse<T, O extends ResponseOptions | undefined = undefined>(
     res: Response,
-    opts: FullResponseOptions
-  ): Promise<BaseResponse<T>>
-  protected async parseResponse<T>(res: Response, opts?: ResultOnlyOptions): Promise<T>
-  protected async parseResponse<T>(
-    res: Response,
-    opts?: ResponseOptions
-  ): Promise<T | BaseResponse<T>> {
+    opts?: O
+  ): Promise<O extends FullResponseOptions ? BaseResponse<T> : T> {
     let data: BaseResponse<T>
     try {
       data = await res.json()
@@ -59,7 +54,9 @@ export class BaseHttpClient {
       ;(e as any).cause = err
       throw e
     }
-    return (opts?.fullResponse ?? false) ? data : data.result
+    const wantsFull = (opts as FullResponseOptions | undefined)?.fullResponse ?? false
+    type Return = O extends FullResponseOptions ? BaseResponse<T> : T
+    return (wantsFull ? data : data.result) as Return
   }
 
   protected buildQuery(params: Record<string, any>): string {

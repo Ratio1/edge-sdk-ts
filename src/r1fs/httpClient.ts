@@ -2,8 +2,7 @@ import {
   BaseHttpClient,
   type FullResponseOptions,
   type RequestOptions,
-  type ResponseOptions,
-  type ResultOnlyOptions
+  type ResponseOptions
 } from '../common/baseHttpClient'
 import type { HttpAdapter } from '../common/http/adapter'
 import { getFormData } from '../common/platform'
@@ -44,22 +43,17 @@ export class R1FSHttpClient extends BaseHttpClient {
     this.chainstorePeers = chainstorePeers
   }
 
-  async getStatus(opts: FullResponseOptions): Promise<R1FSStatusResponse>
-  async getStatus(opts?: ResultOnlyOptions): Promise<R1FSStatusResult>
-  async getStatus(opts?: ResponseOptions): Promise<R1FSStatusResult | R1FSStatusResponse> {
+  async getStatus<R extends ResponseOptions | undefined = undefined>(
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSStatusResponse : R1FSStatusResult> {
     const res = await this.request('/get_status', { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSStatusResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSStatusResult>(res, opts)
+    return await this.parseResponse<R1FSStatusResult, R>(res, opts)
   }
 
-  async addFile(request: UploadFileRequest, opts: FullResponseOptions): Promise<R1FSUploadResponse>
-  async addFile(request: UploadFileRequest, opts?: ResultOnlyOptions): Promise<R1FSUploadResult>
-  async addFile(
+  async addFile<R extends ResponseOptions | undefined = undefined>(
     request: UploadFileRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSUploadResult | R1FSUploadResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSUploadResponse : R1FSUploadResult> {
     if (!request) throw new Error('Upload request is required')
 
     const {
@@ -132,187 +126,109 @@ export class R1FSHttpClient extends BaseHttpClient {
     }
 
     const res = await this.request('/add_file', requestOptions)
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSUploadResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSUploadResult>(res, opts)
+    return await this.parseResponse<R1FSUploadResult, R>(res, opts)
   }
 
-  async addFileBase64(
+  async addFileBase64<R extends ResponseOptions | undefined = undefined>(
     data: UploadBase64Request,
-    opts: FullResponseOptions
-  ): Promise<R1FSUploadResponse>
-  async addFileBase64(
-    data: UploadBase64Request,
-    opts?: ResultOnlyOptions
-  ): Promise<R1FSUploadResult>
-  async addFileBase64(
-    data: UploadBase64Request,
-    opts?: ResponseOptions
-  ): Promise<R1FSUploadResult | R1FSUploadResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSUploadResponse : R1FSUploadResult> {
     const res = await this.request('/add_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSUploadResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSUploadResult>(res, opts)
+    return await this.parseResponse<R1FSUploadResult, R>(res, opts)
   }
 
-  async getFile(
-    request: DownloadFileRequest,
-    opts: FullResponseOptions
-  ): Promise<R1FSDownloadResponse>
-  async getFile(request: DownloadFileRequest, opts?: ResultOnlyOptions): Promise<R1FSDownloadResult>
-  async getFile(
+  async getFile<R extends ResponseOptions | undefined = undefined>(
     { cid, secret }: DownloadFileRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSDownloadResponse : R1FSDownloadResult> {
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
     const res = await this.request(`/get_file?${qs}`, { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseFileResponse<R1FSDownloadResult>(res, opts)
-    }
-    return await this.parseFileResponse<R1FSDownloadResult>(res, opts)
+    return await this.parseFileResponse<R1FSDownloadResult, R>(res, opts)
   }
 
-  async getFileBase64(
-    request: DownloadFileRequest,
-    opts: FullResponseOptions
-  ): Promise<R1FSDownloadResponse>
-  async getFileBase64(
-    request: DownloadFileRequest,
-    opts?: ResultOnlyOptions
-  ): Promise<R1FSDownloadResult>
-  async getFileBase64(
+  async getFileBase64<R extends ResponseOptions | undefined = undefined>(
     { cid, secret }: DownloadFileRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSDownloadResponse : R1FSDownloadResult> {
     const res = await this.request('/get_file_base64', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cid, secret })
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSDownloadResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSDownloadResult>(res, opts)
+    return await this.parseResponse<R1FSDownloadResult, R>(res, opts)
   }
 
-  async addYaml(data: StoreYamlRequest, opts: FullResponseOptions): Promise<R1FSCidResponse>
-  async addYaml(data: StoreYamlRequest, opts?: ResultOnlyOptions): Promise<R1FSCidResult>
-  async addYaml(
+  async addYaml<R extends ResponseOptions | undefined = undefined>(
     data: StoreYamlRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSCidResponse : R1FSCidResult> {
     const res = await this.request('/add_yaml', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSCidResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSCidResult>(res, opts)
+    return await this.parseResponse<R1FSCidResult, R>(res, opts)
   }
 
-  async getYaml(
-    request: RetrieveYamlRequest,
-    opts: FullResponseOptions
-  ): Promise<R1FSYamlDataResponse>
-  async getYaml(request: RetrieveYamlRequest, opts?: ResultOnlyOptions): Promise<R1FSYamlDataResult>
-  async getYaml(
+  async getYaml<R extends ResponseOptions | undefined = undefined>(
     { cid, secret }: RetrieveYamlRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSYamlDataResult | R1FSYamlDataResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSYamlDataResponse : R1FSYamlDataResult> {
     const qs = this.buildQuery({ cid, ...(secret ? { secret } : {}) })
     const res = await this.request(`/get_yaml?${qs}`, { method: 'GET' })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSYamlDataResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSYamlDataResult>(res, opts)
+    return await this.parseResponse<R1FSYamlDataResult, R>(res, opts)
   }
 
-  async addJson(data: StoreJsonRequest, opts: FullResponseOptions): Promise<R1FSCidResponse>
-  async addJson(data: StoreJsonRequest, opts?: ResultOnlyOptions): Promise<R1FSCidResult>
-  async addJson(
+  async addJson<R extends ResponseOptions | undefined = undefined>(
     data: StoreJsonRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSCidResponse : R1FSCidResult> {
     const res = await this.request('/add_json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSCidResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSCidResult>(res, opts)
+    return await this.parseResponse<R1FSCidResult, R>(res, opts)
   }
 
-  async calculateJsonCid(
+  async calculateJsonCid<R extends ResponseOptions | undefined = undefined>(
     data: CalculateCidRequest,
-    opts: FullResponseOptions
-  ): Promise<R1FSCidResponse>
-  async calculateJsonCid(
-    data: CalculateCidRequest,
-    opts?: ResultOnlyOptions
-  ): Promise<R1FSCidResult>
-  async calculateJsonCid(
-    data: CalculateCidRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSCidResponse : R1FSCidResult> {
     const res = await this.request('/calculate_json_cid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSCidResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSCidResult>(res, opts)
+    return await this.parseResponse<R1FSCidResult, R>(res, opts)
   }
 
-  async addPickle(data: StorePickleRequest, opts: FullResponseOptions): Promise<R1FSCidResponse>
-  async addPickle(data: StorePickleRequest, opts?: ResultOnlyOptions): Promise<R1FSCidResult>
-  async addPickle(
+  async addPickle<R extends ResponseOptions | undefined = undefined>(
     data: StorePickleRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSCidResponse : R1FSCidResult> {
     const res = await this.request('/add_pickle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSCidResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSCidResult>(res, opts)
+    return await this.parseResponse<R1FSCidResult, R>(res, opts)
   }
 
-  async calculatePickleCid(
+  async calculatePickleCid<R extends ResponseOptions | undefined = undefined>(
     data: CalculatePickleCidRequest,
-    opts: FullResponseOptions
-  ): Promise<R1FSCidResponse>
-  async calculatePickleCid(
-    data: CalculatePickleCidRequest,
-    opts?: ResultOnlyOptions
-  ): Promise<R1FSCidResult>
-  async calculatePickleCid(
-    data: CalculatePickleCidRequest,
-    opts?: ResponseOptions
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+    opts?: R
+  ): Promise<R extends FullResponseOptions ? R1FSCidResponse : R1FSCidResult> {
     const res = await this.request('/calculate_pickle_cid', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-    if (opts?.fullResponse) {
-      return await this.parseResponse<R1FSCidResult>(res, opts)
-    }
-    return await this.parseResponse<R1FSCidResult>(res, opts)
+    return await this.parseResponse<R1FSCidResult, R>(res, opts)
   }
 
   private appendMetadata(
@@ -471,23 +387,15 @@ export class R1FSHttpClient extends BaseHttpClient {
    * Parse file response that may contain binary data
    * For getFile operations, the server returns binary data directly, not JSON
    */
-  protected async parseFileResponse<T>(
+  protected async parseFileResponse<T, O extends ResponseOptions | undefined = undefined>(
     res: Response,
-    opts: FullResponseOptions
-  ): Promise<BaseResponse<T>>
-  protected async parseFileResponse<T>(res: Response, opts?: ResultOnlyOptions): Promise<T>
-  protected async parseFileResponse<T>(
-    res: Response,
-    opts?: ResponseOptions
-  ): Promise<T | BaseResponse<T>> {
+    opts?: O
+  ): Promise<O extends FullResponseOptions ? BaseResponse<T> : T> {
     const contentType = res.headers.get('content-type') ?? ''
 
     // If content-type indicates JSON, use standard parsing
     if (contentType.includes('application/json')) {
-      if (opts?.fullResponse) {
-        return await this.parseResponse<T>(res, opts)
-      }
-      return await this.parseResponse<T>(res, opts)
+      return await this.parseResponse<T, O>(res, opts)
     }
 
     // For binary content, return the response object directly
@@ -503,6 +411,8 @@ export class R1FSHttpClient extends BaseHttpClient {
       ee_node_ver: ''
     }
 
-    return opts?.fullResponse ? result : result.result
+    const wantsFull = (opts as FullResponseOptions | undefined)?.fullResponse ?? false
+    type Return = O extends FullResponseOptions ? BaseResponse<T> : T
+    return (wantsFull ? result : result.result) as Return
   }
 }
