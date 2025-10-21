@@ -22,53 +22,69 @@ import type {
 export class CStoreService {
   constructor(private readonly http: CStoreHttpClient) {}
 
-  async getStatus(opts?: {
-    fullResponse?: boolean
-  }): Promise<CStoreStatusResult | CStoreStatusResponse> {
-    return await this.http.getStatus(opts)
+  async getStatus(): Promise<CStoreStatusResult> {
+    return await this.http.getStatus()
   }
 
-  async setValue(
-    data: SetValueRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreSetResult | CStoreSetResponse> {
+  async getStatusFull(): Promise<CStoreStatusResponse> {
+    return await this.http.getStatusFull()
+  }
+
+  async setValue(data: SetValueRequest): Promise<CStoreSetResult> {
     if (data.key === '') throw new Error('key is required')
     if (data.value === undefined) throw new Error('value is required')
-    return await this.http.setValue(data, opts)
+    return await this.http.setValue(data)
   }
 
-  async getValue(
-    data: GetValueRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreGetResult | CStoreGetResponse> {
+  async setValueFull(data: SetValueRequest): Promise<CStoreSetResponse> {
     if (data.key === '') throw new Error('key is required')
-    return await this.http.getValue(data, opts)
+    if (data.value === undefined) throw new Error('value is required')
+    return await this.http.setValueFull(data)
   }
 
-  async hset(
-    data: HSetRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHSetResult | CStoreHSetResponse> {
+  async getValue(data: GetValueRequest): Promise<CStoreGetResult> {
+    if (data.key === '') throw new Error('key is required')
+    return await this.http.getValue(data)
+  }
+
+  async getValueFull(data: GetValueRequest): Promise<CStoreGetResponse> {
+    if (data.key === '') throw new Error('key is required')
+    return await this.http.getValueFull(data)
+  }
+
+  async hset(data: HSetRequest): Promise<CStoreHSetResult> {
     if (data.hkey === '') throw new Error('hkey is required')
     if (data.key === '') throw new Error('key is required')
     if (data.value === undefined) throw new Error('value is required')
-    return await this.http.hset(data, opts)
+    return await this.http.hset(data)
   }
 
-  async hget(
-    data: HGetRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHGetResult | CStoreHGetResponse> {
+  async hsetFull(data: HSetRequest): Promise<CStoreHSetResponse> {
     if (data.hkey === '') throw new Error('hkey is required')
     if (data.key === '') throw new Error('key is required')
-    return await this.http.hget(data, opts)
+    if (data.value === undefined) throw new Error('value is required')
+    return await this.http.hsetFull(data)
   }
 
-  async hgetall(
-    data: HGetAllRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHGetAllResult | CStoreHGetAllResponse> {
+  async hget(data: HGetRequest): Promise<CStoreHGetResult> {
     if (data.hkey === '') throw new Error('hkey is required')
-    return await this.http.hgetall(data, opts)
+    if (data.key === '') throw new Error('key is required')
+    return await this.http.hget(data)
+  }
+
+  async hgetFull(data: HGetRequest): Promise<CStoreHGetResponse> {
+    if (data.hkey === '') throw new Error('hkey is required')
+    if (data.key === '') throw new Error('key is required')
+    return await this.http.hgetFull(data)
+  }
+
+  async hgetall(data: HGetAllRequest): Promise<CStoreHGetAllResult> {
+    if (data.hkey === '') throw new Error('hkey is required')
+    return await this.http.hgetall(data)
+  }
+
+  async hgetallFull(data: HGetAllRequest): Promise<CStoreHGetAllResponse> {
+    if (data.hkey === '') throw new Error('hkey is required')
+    return await this.http.hgetallFull(data)
   }
 }

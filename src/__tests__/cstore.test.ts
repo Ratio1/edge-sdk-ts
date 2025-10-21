@@ -17,8 +17,8 @@ describe('cstore e2e', () => {
   })
   it('get_status returns info', async () => {
     nock(cstoreBase).get('/get_status').reply(200, { result: {}, ee_node_alias: 'node' })
-    const status = await client.cstore.getStatus({ fullResponse: true })
-    expect((status as any).ee_node_alias).toBeDefined()
+    const status = await client.cstore.getStatusFull()
+    expect(status.ee_node_alias).toBeDefined()
   })
 
   it('set_value stores a value', async () => {

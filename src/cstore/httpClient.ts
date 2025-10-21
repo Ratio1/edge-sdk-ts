@@ -32,63 +32,89 @@ export class CStoreHttpClient extends BaseHttpClient {
     this.chainstorePeers = chainstorePeers
   }
 
-  async getStatus(opts?: {
-    fullResponse?: boolean
-  }): Promise<CStoreStatusResult | CStoreStatusResponse> {
-    const res = await this.request('/get_status', { method: 'GET' })
-    return await this.parseResponse<CStoreStatusResult>(res, opts)
+  async getStatus(): Promise<CStoreStatusResult> {
+    const res = await this.getStatusFull()
+    return res.result
   }
 
-  async setValue(
-    { key, value }: SetValueRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreSetResult | CStoreSetResponse> {
-    const chainstorePeers = this.chainstorePeers.length > 0 ? this.chainstorePeers : []
+  async getStatusFull(): Promise<CStoreStatusResponse> {
+    const res = await this.request('/get_status', { method: 'GET' })
+    return await this.parseResponseFull<CStoreStatusResult, CStoreStatusResponse>(res)
+  }
+
+  async setValue(request: SetValueRequest): Promise<CStoreSetResult> {
+    const res = await this.setValueFull(request)
+    return res.result
+  }
+
+  async setValueFull(request: SetValueRequest): Promise<CStoreSetResponse> {
+    const chainstorePeers = this.resolveChainstorePeers()
     const res = await this.request('/set', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value: String(value), chainstore_peers: chainstorePeers })
+      body: JSON.stringify({
+        key: request.key,
+        value: String(request.value),
+        chainstore_peers: chainstorePeers
+      })
     })
-    return await this.parseResponse<CStoreSetResult>(res, opts)
+    return await this.parseResponseFull<CStoreSetResult, CStoreSetResponse>(res)
   }
 
-  async getValue(
-    { key }: GetValueRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreGetResult | CStoreGetResponse> {
-    const qs = this.buildQuery({ key })
+  async getValue(request: GetValueRequest): Promise<CStoreGetResult> {
+    const res = await this.getValueFull(request)
+    return res.result
+  }
+
+  async getValueFull(request: GetValueRequest): Promise<CStoreGetResponse> {
+    const qs = this.buildQuery({ key: request.key })
     const res = await this.request(`/get?${qs}`, { method: 'GET' })
-    return await this.parseResponse<CStoreGetResult>(res, opts)
+    return await this.parseResponseFull<CStoreGetResult, CStoreGetResponse>(res)
   }
 
-  async hset(
-    { hkey, key, value }: HSetRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHSetResult | CStoreHSetResponse> {
-    const chainstorePeers = this.chainstorePeers.length > 0 ? this.chainstorePeers : []
+  async hset(request: HSetRequest): Promise<CStoreHSetResult> {
+    const res = await this.hsetFull(request)
+    return res.result
+  }
+
+  async hsetFull(request: HSetRequest): Promise<CStoreHSetResponse> {
+    const chainstorePeers = this.resolveChainstorePeers()
     const res = await this.request('/hset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hkey, key, value: String(value), chainstore_peers: chainstorePeers })
+      body: JSON.stringify({
+        hkey: request.hkey,
+        key: request.key,
+        value: String(request.value),
+        chainstore_peers: chainstorePeers
+      })
     })
-    return await this.parseResponse<CStoreHSetResult>(res, opts)
+    return await this.parseResponseFull<CStoreHSetResult, CStoreHSetResponse>(res)
   }
 
-  async hget(
-    { hkey, key }: HGetRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHGetResult | CStoreHGetResponse> {
-    const qs = this.buildQuery({ hkey, key })
+  async hget(request: HGetRequest): Promise<CStoreHGetResult> {
+    const res = await this.hgetFull(request)
+    return res.result
+  }
+
+  async hgetFull(request: HGetRequest): Promise<CStoreHGetResponse> {
+    const qs = this.buildQuery({ hkey: request.hkey, key: request.key })
     const res = await this.request(`/hget?${qs}`, { method: 'GET' })
-    return await this.parseResponse<CStoreHGetResult>(res, opts)
+    return await this.parseResponseFull<CStoreHGetResult, CStoreHGetResponse>(res)
   }
 
-  async hgetall(
-    { hkey }: HGetAllRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<CStoreHGetAllResult | CStoreHGetAllResponse> {
-    const qs = this.buildQuery({ hkey })
+  async hgetall(request: HGetAllRequest): Promise<CStoreHGetAllResult> {
+    const res = await this.hgetallFull(request)
+    return res.result
+  }
+
+  async hgetallFull(request: HGetAllRequest): Promise<CStoreHGetAllResponse> {
+    const qs = this.buildQuery({ hkey: request.hkey })
     const res = await this.request(`/hgetall?${qs}`, { method: 'GET' })
-    return await this.parseResponse<CStoreHGetAllResult>(res, opts)
+    return await this.parseResponseFull<CStoreHGetAllResult, CStoreHGetAllResponse>(res)
+  }
+
+  private resolveChainstorePeers(): string[] {
+    return this.chainstorePeers.length > 0 ? this.chainstorePeers : []
   }
 }
