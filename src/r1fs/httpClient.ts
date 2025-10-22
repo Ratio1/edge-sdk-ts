@@ -148,7 +148,10 @@ export class R1FSHttpClient extends BaseHttpClient {
   }
 
   async getFileFull(request: DownloadFileRequest): Promise<R1FSDownloadResponse> {
-    const qs = this.buildQuery({ cid: request.cid, ...(request.secret ? { secret: request.secret } : {}) })
+    const qs = this.buildQuery({
+      cid: request.cid,
+      ...(request.secret ? { secret: request.secret } : {})
+    })
     const res = await this.request(`/get_file?${qs}`, { method: 'GET' })
     return await this.parseFileResponseFull<R1FSDownloadResult, R1FSDownloadResponse>(res)
   }
@@ -187,7 +190,10 @@ export class R1FSHttpClient extends BaseHttpClient {
   }
 
   async getYamlFull(request: RetrieveYamlRequest): Promise<R1FSYamlDataResponse> {
-    const qs = this.buildQuery({ cid: request.cid, ...(request.secret ? { secret: request.secret } : {}) })
+    const qs = this.buildQuery({
+      cid: request.cid,
+      ...(request.secret ? { secret: request.secret } : {})
+    })
     const res = await this.request(`/get_yaml?${qs}`, { method: 'GET' })
     return await this.parseResponseFull<R1FSYamlDataResult, R1FSYamlDataResponse>(res)
   }
@@ -431,7 +437,7 @@ export class R1FSHttpClient extends BaseHttpClient {
       ee_node_eth_address: '',
       ee_node_network: '',
       ee_node_ver: ''
-    } as BaseResponse<TResult>
+    }
 
     return result as TResponse
   }
