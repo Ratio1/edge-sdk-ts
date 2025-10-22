@@ -7,7 +7,7 @@ export function getFetch(): typeof fetch {
 }
 
 export function getFormData(): typeof FormData {
-  const isBrowser = typeof window?.document !== 'undefined'
+  const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined'
 
   if (isBrowser && typeof window.FormData !== 'undefined') {
     return window.FormData
