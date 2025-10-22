@@ -24,92 +24,117 @@ import type {
 export class R1FSService {
   constructor(private readonly http: R1FSHttpClient) {}
 
-  async getStatus(opts?: {
-    fullResponse?: boolean
-  }): Promise<R1FSStatusResult | R1FSStatusResponse> {
-    return await this.http.getStatus(opts)
+  async getStatus(): Promise<R1FSStatusResult> {
+    return await this.http.getStatus()
   }
 
-  async addFile(
-    data: UploadFileRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSUploadResult | R1FSUploadResponse> {
+  async getStatusFull(): Promise<R1FSStatusResponse> {
+    return await this.http.getStatusFull()
+  }
+
+  async addFile(data: UploadFileRequest): Promise<R1FSUploadResult> {
     if (data?.formData == null && data?.file == null)
       throw new Error('file or formData is required')
-    return await this.http.addFile(data, opts)
+    return await this.http.addFile(data)
   }
 
-  async addFileBase64(
-    data: UploadBase64Request,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSUploadResult | R1FSUploadResponse> {
+  async addFileFull(data: UploadFileRequest): Promise<R1FSUploadResponse> {
+    if (data?.formData == null && data?.file == null)
+      throw new Error('file or formData is required')
+    return await this.http.addFileFull(data)
+  }
+
+  async addFileBase64(data: UploadBase64Request): Promise<R1FSUploadResult> {
     if (data.file_base64_str === '') throw new Error('file_base64_str is required')
-    return await this.http.addFileBase64(data, opts)
+    return await this.http.addFileBase64(data)
   }
 
-  async getFile(
-    data: DownloadFileRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
+  async addFileBase64Full(data: UploadBase64Request): Promise<R1FSUploadResponse> {
+    if (data.file_base64_str === '') throw new Error('file_base64_str is required')
+    return await this.http.addFileBase64Full(data)
+  }
+
+  async getFile(data: DownloadFileRequest): Promise<R1FSDownloadResult> {
     if (data.cid === '') throw new Error('cid is required')
-    return await this.http.getFile(data, opts)
+    return await this.http.getFile(data)
   }
 
-  async getFileBase64(
-    data: DownloadFileRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSDownloadResult | R1FSDownloadResponse> {
+  async getFileFull(data: DownloadFileRequest): Promise<R1FSDownloadResponse> {
     if (data.cid === '') throw new Error('cid is required')
-    return await this.http.getFileBase64(data, opts)
+    return await this.http.getFileFull(data)
   }
 
-  async addYaml(
-    data: StoreYamlRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+  async getFileBase64(data: DownloadFileRequest): Promise<R1FSDownloadResult> {
+    if (data.cid === '') throw new Error('cid is required')
+    return await this.http.getFileBase64(data)
+  }
+
+  async getFileBase64Full(data: DownloadFileRequest): Promise<R1FSDownloadResponse> {
+    if (data.cid === '') throw new Error('cid is required')
+    return await this.http.getFileBase64Full(data)
+  }
+
+  async addYaml(data: StoreYamlRequest): Promise<R1FSCidResult> {
     if (!data.data) throw new Error('data is required')
-    return await this.http.addYaml(data, opts)
+    return await this.http.addYaml(data)
   }
 
-  async getYaml(
-    data: RetrieveYamlRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSYamlDataResult | R1FSYamlDataResponse> {
-    if (data.cid === '') throw new Error('cid is required')
-    return await this.http.getYaml(data, opts)
-  }
-
-  async addJson(
-    data: StoreJsonRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+  async addYamlFull(data: StoreYamlRequest): Promise<R1FSCidResponse> {
     if (!data.data) throw new Error('data is required')
-    return await this.http.addJson(data, opts)
+    return await this.http.addYamlFull(data)
   }
 
-  async calculateJsonCid(
-    data: CalculateCidRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+  async getYaml(data: RetrieveYamlRequest): Promise<R1FSYamlDataResult> {
+    if (data.cid === '') throw new Error('cid is required')
+    return await this.http.getYaml(data)
+  }
+
+  async getYamlFull(data: RetrieveYamlRequest): Promise<R1FSYamlDataResponse> {
+    if (data.cid === '') throw new Error('cid is required')
+    return await this.http.getYamlFull(data)
+  }
+
+  async addJson(data: StoreJsonRequest): Promise<R1FSCidResult> {
+    if (!data.data) throw new Error('data is required')
+    return await this.http.addJson(data)
+  }
+
+  async addJsonFull(data: StoreJsonRequest): Promise<R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    return await this.http.addJsonFull(data)
+  }
+
+  async calculateJsonCid(data: CalculateCidRequest): Promise<R1FSCidResult> {
     if (!data.data) throw new Error('data is required')
     if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
-    return await this.http.calculateJsonCid(data, opts)
+    return await this.http.calculateJsonCid(data)
   }
 
-  async addPickle(
-    data: StorePickleRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
-    if (!data.data) throw new Error('data is required')
-    return await this.http.addPickle(data, opts)
-  }
-
-  async calculatePickleCid(
-    data: CalculatePickleCidRequest,
-    opts?: { fullResponse?: boolean }
-  ): Promise<R1FSCidResult | R1FSCidResponse> {
+  async calculateJsonCidFull(data: CalculateCidRequest): Promise<R1FSCidResponse> {
     if (!data.data) throw new Error('data is required')
     if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
-    return await this.http.calculatePickleCid(data, opts)
+    return await this.http.calculateJsonCidFull(data)
+  }
+
+  async addPickle(data: StorePickleRequest): Promise<R1FSCidResult> {
+    if (!data.data) throw new Error('data is required')
+    return await this.http.addPickle(data)
+  }
+
+  async addPickleFull(data: StorePickleRequest): Promise<R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    return await this.http.addPickleFull(data)
+  }
+
+  async calculatePickleCid(data: CalculatePickleCidRequest): Promise<R1FSCidResult> {
+    if (!data.data) throw new Error('data is required')
+    if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
+    return await this.http.calculatePickleCid(data)
+  }
+
+  async calculatePickleCidFull(data: CalculatePickleCidRequest): Promise<R1FSCidResponse> {
+    if (!data.data) throw new Error('data is required')
+    if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
+    return await this.http.calculatePickleCidFull(data)
   }
 }

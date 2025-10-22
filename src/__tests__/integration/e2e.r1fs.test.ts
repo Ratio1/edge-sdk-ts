@@ -23,7 +23,7 @@ describe('r1fs e2e', () => {
   it('add_file uploads data', async () => {
     const formData = new FormData()
     formData.append('file', new Blob([fileContent]), 'mock.txt')
-    const res = (await ratio1.r1fs.addFile({ formData }, { fullResponse: true })) as any
+    const res = await ratio1.r1fs.addFileFull({ formData })
     expect(res.result.cid).toBeDefined()
     cidFile = res.result.cid!
   })
@@ -35,10 +35,10 @@ describe('r1fs e2e', () => {
   })
 
   it('add_file_base64 uploads data', async () => {
-    const res = (await ratio1.r1fs.addFileBase64(
-      { file_base64_str: baseStr, filename: 'mock.txt' },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.addFileBase64Full({
+      file_base64_str: baseStr,
+      filename: 'mock.txt'
+    })
     expect(res.result.cid).toBeDefined()
     cidB64 = res.result.cid!
   })
@@ -50,20 +50,18 @@ describe('r1fs e2e', () => {
 
   it('add_yaml stores yaml data', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-    const res = (await ratio1.r1fs.addYaml(
-      { data: testData, fn: 'test.yaml', secret: 'test-secret' },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.addYamlFull({
+      data: testData,
+      fn: 'test.yaml',
+      secret: 'test-secret'
+    })
     expect(res.result.cid).toBeDefined()
   })
 
   it('get_yaml retrieves yaml data', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
     const secret = 'test-secret-get'
-    const addRes = (await ratio1.r1fs.addYaml(
-      { data: testData, fn: 'test.yaml', secret },
-      { fullResponse: true }
-    )) as any
+    const addRes = await ratio1.r1fs.addYamlFull({ data: testData, fn: 'test.yaml', secret })
     console.log('====================')
     console.log('====================---------')
     console.log(addRes)
@@ -90,37 +88,45 @@ describe('r1fs e2e', () => {
 
   it('add_json stores json data', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-    const res = (await ratio1.r1fs.addJson(
-      { data: testData, fn: 'test.json', secret: 'test-secret', nonce: 1 },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.addJsonFull({
+      data: testData,
+      fn: 'test.json',
+      secret: 'test-secret',
+      nonce: 1
+    })
     expect(res.result.cid).toBeDefined()
   })
 
   it('add_pickle stores pickle data', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-    const res = (await ratio1.r1fs.addPickle(
-      { data: testData, fn: 'test.pkl', secret: 'test-secret', nonce: 1 },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.addPickleFull({
+      data: testData,
+      fn: 'test.pkl',
+      secret: 'test-secret',
+      nonce: 1
+    })
     expect(res.result.cid).toBeDefined()
   })
 
   it('calculate_json_cid calculates cid without storing', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-    const res = (await ratio1.r1fs.calculateJsonCid(
-      { data: testData, nonce: 1, fn: 'test.json', secret: 'test-secret' },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.calculateJsonCidFull({
+      data: testData,
+      nonce: 1,
+      fn: 'test.json',
+      secret: 'test-secret'
+    })
     expect(res.result.cid).toBeDefined()
   })
 
   it('calculate_pickle_cid calculates cid without storing', async () => {
     const testData = { name: 'test', value: 123, nested: { key: 'value' } }
-    const res = (await ratio1.r1fs.calculatePickleCid(
-      { data: testData, nonce: 1, fn: 'test.pkl', secret: 'test-secret' },
-      { fullResponse: true }
-    )) as any
+    const res = await ratio1.r1fs.calculatePickleCidFull({
+      data: testData,
+      nonce: 1,
+      fn: 'test.pkl',
+      secret: 'test-secret'
+    })
     expect(res.result.cid).toBeDefined()
   })
 })

@@ -34,11 +34,16 @@ export class BaseHttpClient {
     return res
   }
 
-  protected async parseResponse<T>(
-    res: Response,
-    opts?: { fullResponse?: boolean }
-  ): Promise<T | BaseResponse<T>> {
-    let data: BaseResponse<T>
+  protected async parseResponse<TResult>(res: Response): Promise<TResult> {
+    const full = await this.parseResponseFull<TResult>(res)
+    return full.result
+  }
+
+  protected async parseResponseFull<
+    TResult,
+    TResponse extends BaseResponse<TResult> = BaseResponse<TResult>
+  >(res: Response): Promise<TResponse> {
+    let data: unknown
     try {
       data = await res.json()
     } catch (err) {
@@ -46,7 +51,7 @@ export class BaseHttpClient {
       ;(e as any).cause = err
       throw e
     }
-    return (opts?.fullResponse ?? false) ? data : data.result
+    return data as TResponse
   }
 
   protected buildQuery(params: Record<string, any>): string {
