@@ -7,13 +7,13 @@ export interface CStoreStatusResult {
   keys: string[]
 }
 
-export type CStoreGetResult = string
+export type CStoreGetResult = string | null
 
 export type CStoreSetResult = boolean
 
 export type CStoreHSetResult = boolean
 
-export type CStoreHGetResult = string
+export type CStoreHGetResult = string | null
 
 export type CStoreHGetAllResult = Record<string, string>
 
