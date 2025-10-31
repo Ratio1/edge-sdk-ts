@@ -3,6 +3,12 @@ import type {
   CalculateCidRequest,
   CalculatePickleCidRequest,
   DownloadFileRequest,
+  DeleteFileRequest,
+  DeleteFileResponse,
+  DeleteFileResult,
+  DeleteFilesRequest,
+  DeleteFilesResponse,
+  DeleteFilesResult,
   R1FSCidResponse,
   R1FSCidResult,
   R1FSDownloadResponse,
@@ -136,5 +142,29 @@ export class R1FSService {
     if (!data.data) throw new Error('data is required')
     if (data.nonce === undefined || data.nonce === null) throw new Error('nonce is required')
     return await this.http.calculatePickleCidFull(data)
+  }
+
+  async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResult> {
+    if (!request.cid) throw new Error('cid is required')
+    return await this.http.deleteFile(request)
+  }
+
+  async deleteFileFull(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+    if (!request.cid) throw new Error('cid is required')
+    return await this.http.deleteFileFull(request)
+  }
+
+  async deleteFiles(request: DeleteFilesRequest): Promise<DeleteFilesResult> {
+    if (!Array.isArray(request.cids) || request.cids.length === 0) {
+      throw new Error('cids is required')
+    }
+    return await this.http.deleteFiles(request)
+  }
+
+  async deleteFilesFull(request: DeleteFilesRequest): Promise<DeleteFilesResponse> {
+    if (!Array.isArray(request.cids) || request.cids.length === 0) {
+      throw new Error('cids is required')
+    }
+    return await this.http.deleteFilesFull(request)
   }
 }

@@ -158,6 +158,60 @@ describe('R1FSClient', () => {
     })
     expect((res as any).cid).toBe('calculated-pickle-cid-123')
   })
+
+  it('deleteFile calls /delete_file with correct data', async () => {
+    nock(baseUrl)
+      .post('/delete_file', {
+        cid: 'cid-to-delete',
+        unpin_remote: true,
+        run_gc: true,
+        cleanup_local_files: false
+      })
+      .reply(200, {
+        result: { success: true, message: 'deleted', cid: 'cid-to-delete' }
+      })
+
+    const res = await client.r1fs.deleteFile({
+      cid: 'cid-to-delete',
+      unpin_remote: true,
+      run_gc: true,
+      cleanup_local_files: false
+    })
+    expect(res.success).toBe(true)
+    expect(res.cid).toBe('cid-to-delete')
+    expect(res.message).toBe('deleted')
+  })
+
+  it('deleteFiles calls /delete_files with correct data', async () => {
+    nock(baseUrl)
+      .post('/delete_files', {
+        cids: ['cid-1', 'cid-2'],
+        unpin_remote: false,
+        run_gc_after_all: true,
+        cleanup_local_files: true
+      })
+      .reply(200, {
+        result: {
+          success: ['cid-1'],
+          failed: ['cid-2'],
+          total: 2,
+          success_count: 1,
+          failed_count: 1
+        }
+      })
+
+    const res = await client.r1fs.deleteFiles({
+      cids: ['cid-1', 'cid-2'],
+      unpin_remote: false,
+      run_gc_after_all: true,
+      cleanup_local_files: true
+    })
+    expect(res.total).toBe(2)
+    expect(res.success).toEqual(['cid-1'])
+    expect(res.failed).toEqual(['cid-2'])
+    expect(res.success_count).toBe(1)
+    expect(res.failed_count).toBe(1)
+  })
 })
 
 describe('R1FSClient multipart streaming with undici', () => {
