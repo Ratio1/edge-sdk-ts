@@ -151,3 +151,35 @@ export interface CalculatePickleCidRequest {
   fn?: string
   secret?: string
 }
+
+export interface DeleteFileRequest {
+  cid: string
+  unpin_remote?: boolean
+  run_gc?: boolean
+  cleanup_local_files?: boolean
+}
+
+export interface DeleteFileResult {
+  success: boolean
+  message: string
+  cid: string
+}
+
+export interface DeleteFileResponse extends R1FSBaseResponse<DeleteFileResult> {}
+
+export interface DeleteFilesRequest {
+  cids: string[]
+  unpin_remote?: boolean
+  run_gc_after_all?: boolean
+  cleanup_local_files?: boolean
+}
+
+export interface DeleteFilesResult {
+  success: string[]
+  failed: string[]
+  total: number
+  success_count: number
+  failed_count: number
+}
+
+export interface DeleteFilesResponse extends R1FSBaseResponse<DeleteFilesResult> {}
