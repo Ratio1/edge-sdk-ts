@@ -18,9 +18,13 @@ export interface EdgeSdkOptions {
 
 // Helper function to get environment variables safely
 function getEnvVar(keys: string[]): string | undefined {
-  if (window?.__RATIO1_ENV__) {
+  const ratio1Env =
+    (typeof window !== 'undefined' && window.__RATIO1_ENV__) ||
+    ((typeof globalThis !== 'undefined' && (globalThis as any).window?.__RATIO1_ENV__) ?? undefined)
+
+  if (ratio1Env) {
     for (const k of keys) {
-      if (window.__RATIO1_ENV__[k]) return window.__RATIO1_ENV__[k]
+      if (ratio1Env[k]) return ratio1Env[k]
     }
   }
 

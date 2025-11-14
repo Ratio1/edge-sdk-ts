@@ -6,6 +6,12 @@ import {
   type CalculateCidRequest,
   type CalculatePickleCidRequest,
   type DownloadFileRequest,
+  type DeleteFileRequest,
+  type DeleteFileResponse,
+  type DeleteFileResult,
+  type DeleteFilesRequest,
+  type DeleteFilesResponse,
+  type DeleteFilesResult,
   type R1FSCidResponse,
   type R1FSCidResult,
   type R1FSDownloadResponse,
@@ -252,6 +258,50 @@ export class R1FSHttpClient extends BaseHttpClient {
       body: JSON.stringify(data)
     })
     return await this.parseResponseFull<R1FSCidResult, R1FSCidResponse>(res)
+  }
+
+  async deleteFile(request: DeleteFileRequest): Promise<DeleteFileResult> {
+    const res = await this.deleteFileFull(request)
+    return res.result
+  }
+
+  async deleteFileFull(request: DeleteFileRequest): Promise<DeleteFileResponse> {
+    const payload: Record<string, unknown> = { cid: request.cid }
+    if (request.unpin_remote !== undefined) payload.unpin_remote = request.unpin_remote
+    if (request.run_gc !== undefined) payload.run_gc = request.run_gc
+    if (request.cleanup_local_files !== undefined) {
+      payload.cleanup_local_files = request.cleanup_local_files
+    }
+
+    const res = await this.request('/delete_file', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    return await this.parseResponseFull<DeleteFileResult, DeleteFileResponse>(res)
+  }
+
+  async deleteFiles(request: DeleteFilesRequest): Promise<DeleteFilesResult> {
+    const res = await this.deleteFilesFull(request)
+    return res.result
+  }
+
+  async deleteFilesFull(request: DeleteFilesRequest): Promise<DeleteFilesResponse> {
+    const payload: Record<string, unknown> = { cids: request.cids }
+    if (request.unpin_remote !== undefined) payload.unpin_remote = request.unpin_remote
+    if (request.run_gc_after_all !== undefined) {
+      payload.run_gc_after_all = request.run_gc_after_all
+    }
+    if (request.cleanup_local_files !== undefined) {
+      payload.cleanup_local_files = request.cleanup_local_files
+    }
+
+    const res = await this.request('/delete_files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    return await this.parseResponseFull<DeleteFilesResult, DeleteFilesResponse>(res)
   }
 
   private appendMetadata(

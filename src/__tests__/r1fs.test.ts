@@ -147,6 +147,43 @@ describe('r1fs e2e', () => {
     })
     expect((res as any).cid).toBe('calculated-pickle-cid-123')
   })
+
+  it('delete_file deletes a cid', async () => {
+    nock(r1fsBase)
+      .post('/delete_file')
+      .reply(200, { result: { success: true, message: 'deleted', cid: 'cid-123' } })
+    const res = await client.r1fs.deleteFile({
+      cid: 'cid-123',
+      unpin_remote: true,
+      run_gc: false,
+      cleanup_local_files: false
+    })
+    expect(res.success).toBe(true)
+    expect(res.cid).toBe('cid-123')
+  })
+
+  it('delete_files deletes multiple cids', async () => {
+    nock(r1fsBase)
+      .post('/delete_files')
+      .reply(200, {
+        result: {
+          success: ['cid-1'],
+          failed: ['cid-2'],
+          total: 2,
+          success_count: 1,
+          failed_count: 1
+        }
+      })
+    const res = await client.r1fs.deleteFiles({
+      cids: ['cid-1', 'cid-2'],
+      unpin_remote: true,
+      run_gc_after_all: true,
+      cleanup_local_files: false
+    })
+    expect(res.success_count).toBe(1)
+    expect(res.failed_count).toBe(1)
+    expect(res.total).toBe(2)
+  })
   //
   // it('add_file_base64 uploads data', async () => {
   //   const res = await client.r1fs.addFileBase64({ file_base64_str: baseStr, filename: 'mock.txt' })
