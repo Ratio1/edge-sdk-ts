@@ -22,7 +22,7 @@ describe('cstore e2e', () => {
 
   it('get_value returns the stored value', async () => {
     const res = await ratio1.cstore.getValue({ key: storedKey })
-    expect(res).toBe('1')
+    expect(res).toBe(1)
   })
 
   it('hset stores a hash entry', async () => {

@@ -54,7 +54,7 @@ export class CStoreHttpClient extends BaseHttpClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         key: request.key,
-        value: this.serializeValue(request.value),
+        value: request.value,
         chainstore_peers: chainstorePeers
       })
     })
@@ -85,7 +85,7 @@ export class CStoreHttpClient extends BaseHttpClient {
       body: JSON.stringify({
         hkey: request.hkey,
         key: request.key,
-        value: this.serializeValue(request.value),
+        value: request.value,
         chainstore_peers: chainstorePeers
       })
     })
@@ -116,15 +116,5 @@ export class CStoreHttpClient extends BaseHttpClient {
 
   private resolveChainstorePeers(): string[] {
     return this.chainstorePeers.length > 0 ? this.chainstorePeers : []
-  }
-
-  private serializeValue(value: unknown): string {
-    if (value === null) {
-      return 'null'
-    }
-    if (typeof value === 'object') {
-      return JSON.stringify(value)
-    }
-    return String(value)
   }
 }

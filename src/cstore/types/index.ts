@@ -7,15 +7,15 @@ export interface CStoreStatusResult {
   keys: string[]
 }
 
-export type CStoreGetResult = string | null
+export type CStoreGetResult = unknown
 
 export type CStoreSetResult = boolean
 
 export type CStoreHSetResult = boolean
 
-export type CStoreHGetResult = string | null
+export type CStoreHGetResult = unknown
 
-export type CStoreHGetAllResult = Record<string, string>
+export type CStoreHGetAllResult = Record<string, unknown>
 
 // Specific response types with proper result typing
 export interface CStoreStatusResponse extends CStoreBaseResponse<CStoreStatusResult> {
