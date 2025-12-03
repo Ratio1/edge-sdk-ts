@@ -23,16 +23,16 @@ describe('cstore e2e', () => {
 
   it('set_value stores a value', async () => {
     nock(cstoreBase)
-      .post('/set', { key: storedKey, value: '1', chainstore_peers: [] })
+      .post('/set', { key: storedKey, value: 1, chainstore_peers: [] })
       .reply(200, { result: true })
     const res = await client.cstore.setValue({ key: storedKey, value: 1 })
     expect(res).toBe(true)
   })
 
   it('get_value returns the stored value', async () => {
-    nock(cstoreBase).get('/get').query({ key: storedKey }).reply(200, { result: '1' })
+    nock(cstoreBase).get('/get').query({ key: storedKey }).reply(200, { result: 1 })
     const res = await client.cstore.getValue({ key: storedKey })
-    expect(res).toBe('1')
+    expect(res).toBe(1)
   })
 
   it('hset stores a hash entry', async () => {

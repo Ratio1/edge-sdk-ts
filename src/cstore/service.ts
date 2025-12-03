@@ -42,14 +42,14 @@ export class CStoreService {
     return await this.http.setValueFull(data)
   }
 
-  async getValue(data: GetValueRequest): Promise<CStoreGetResult> {
+  async getValue<T = unknown>(data: GetValueRequest): Promise<CStoreGetResult<T>> {
     if (data.key === '') throw new Error('key is required')
-    return await this.http.getValue(data)
+    return await this.http.getValue<T>(data)
   }
 
-  async getValueFull(data: GetValueRequest): Promise<CStoreGetResponse> {
+  async getValueFull<T = unknown>(data: GetValueRequest): Promise<CStoreGetResponse<T>> {
     if (data.key === '') throw new Error('key is required')
-    return await this.http.getValueFull(data)
+    return await this.http.getValueFull<T>(data)
   }
 
   async hset(data: HSetRequest): Promise<CStoreHSetResult> {
@@ -66,25 +66,25 @@ export class CStoreService {
     return await this.http.hsetFull(data)
   }
 
-  async hget(data: HGetRequest): Promise<CStoreHGetResult> {
+  async hget<T = unknown>(data: HGetRequest): Promise<CStoreHGetResult<T>> {
     if (data.hkey === '') throw new Error('hkey is required')
     if (data.key === '') throw new Error('key is required')
-    return await this.http.hget(data)
+    return await this.http.hget<T>(data)
   }
 
-  async hgetFull(data: HGetRequest): Promise<CStoreHGetResponse> {
+  async hgetFull<T = unknown>(data: HGetRequest): Promise<CStoreHGetResponse<T>> {
     if (data.hkey === '') throw new Error('hkey is required')
     if (data.key === '') throw new Error('key is required')
-    return await this.http.hgetFull(data)
+    return await this.http.hgetFull<T>(data)
   }
 
-  async hgetall(data: HGetAllRequest): Promise<CStoreHGetAllResult> {
+  async hgetall<T = unknown>(data: HGetAllRequest): Promise<CStoreHGetAllResult<T>> {
     if (data.hkey === '') throw new Error('hkey is required')
-    return await this.http.hgetall(data)
+    return await this.http.hgetall<T>(data)
   }
 
-  async hgetallFull(data: HGetAllRequest): Promise<CStoreHGetAllResponse> {
+  async hgetallFull<T = unknown>(data: HGetAllRequest): Promise<CStoreHGetAllResponse<T>> {
     if (data.hkey === '') throw new Error('hkey is required')
-    return await this.http.hgetallFull(data)
+    return await this.http.hgetallFull<T>(data)
   }
 }
