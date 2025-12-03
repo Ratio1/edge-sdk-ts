@@ -61,15 +61,15 @@ export class CStoreHttpClient extends BaseHttpClient {
     return await this.parseResponseFull<CStoreSetResult, CStoreSetResponse>(res)
   }
 
-  async getValue(request: GetValueRequest): Promise<CStoreGetResult> {
-    const res = await this.getValueFull(request)
+  async getValue<T = unknown>(request: GetValueRequest): Promise<CStoreGetResult<T>> {
+    const res = await this.getValueFull<T>(request)
     return res.result
   }
 
-  async getValueFull(request: GetValueRequest): Promise<CStoreGetResponse> {
+  async getValueFull<T = unknown>(request: GetValueRequest): Promise<CStoreGetResponse<T>> {
     const qs = this.buildQuery({ key: request.key })
     const res = await this.request(`/get?${qs}`, { method: 'GET' })
-    return await this.parseResponseFull<CStoreGetResult, CStoreGetResponse>(res)
+    return await this.parseResponseFull<CStoreGetResult<T>, CStoreGetResponse<T>>(res)
   }
 
   async hset(request: HSetRequest): Promise<CStoreHSetResult> {
@@ -92,26 +92,26 @@ export class CStoreHttpClient extends BaseHttpClient {
     return await this.parseResponseFull<CStoreHSetResult, CStoreHSetResponse>(res)
   }
 
-  async hget(request: HGetRequest): Promise<CStoreHGetResult> {
-    const res = await this.hgetFull(request)
+  async hget<T = unknown>(request: HGetRequest): Promise<CStoreHGetResult<T>> {
+    const res = await this.hgetFull<T>(request)
     return res.result
   }
 
-  async hgetFull(request: HGetRequest): Promise<CStoreHGetResponse> {
+  async hgetFull<T = unknown>(request: HGetRequest): Promise<CStoreHGetResponse<T>> {
     const qs = this.buildQuery({ hkey: request.hkey, key: request.key })
     const res = await this.request(`/hget?${qs}`, { method: 'GET' })
-    return await this.parseResponseFull<CStoreHGetResult, CStoreHGetResponse>(res)
+    return await this.parseResponseFull<CStoreHGetResult<T>, CStoreHGetResponse<T>>(res)
   }
 
-  async hgetall(request: HGetAllRequest): Promise<CStoreHGetAllResult> {
-    const res = await this.hgetallFull(request)
+  async hgetall<T = unknown>(request: HGetAllRequest): Promise<CStoreHGetAllResult<T>> {
+    const res = await this.hgetallFull<T>(request)
     return res.result
   }
 
-  async hgetallFull(request: HGetAllRequest): Promise<CStoreHGetAllResponse> {
+  async hgetallFull<T = unknown>(request: HGetAllRequest): Promise<CStoreHGetAllResponse<T>> {
     const qs = this.buildQuery({ hkey: request.hkey })
     const res = await this.request(`/hgetall?${qs}`, { method: 'GET' })
-    return await this.parseResponseFull<CStoreHGetAllResult, CStoreHGetAllResponse>(res)
+    return await this.parseResponseFull<CStoreHGetAllResult<T>, CStoreHGetAllResponse<T>>(res)
   }
 
   private resolveChainstorePeers(): string[] {
