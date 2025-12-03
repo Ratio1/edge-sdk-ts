@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+      - fix-cstore-set
 
 jobs:
   build-and-publish-alpha:
