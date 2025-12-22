@@ -7,15 +7,15 @@ export interface CStoreStatusResult {
   keys: string[]
 }
 
-export type CStoreGetResult = string | null
+export type CStoreGetResult<T = unknown> = T
 
 export type CStoreSetResult = boolean
 
 export type CStoreHSetResult = boolean
 
-export type CStoreHGetResult = string | null
+export type CStoreHGetResult<T = unknown> = T
 
-export type CStoreHGetAllResult = Record<string, string>
+export type CStoreHGetAllResult<T = unknown> = Record<string, T>
 
 // Specific response types with proper result typing
 export interface CStoreStatusResponse extends CStoreBaseResponse<CStoreStatusResult> {
@@ -28,15 +28,15 @@ export interface CStoreStatusResponse extends CStoreBaseResponse<CStoreStatusRes
   ee_node_ver: string
 }
 
-export interface CStoreGetResponse extends CStoreBaseResponse<CStoreGetResult> {}
+export interface CStoreGetResponse<T = unknown> extends CStoreBaseResponse<CStoreGetResult<T>> {}
 
 export interface CStoreSetResponse extends CStoreBaseResponse<CStoreSetResult> {}
 
 export interface CStoreHSetResponse extends CStoreBaseResponse<CStoreHSetResult> {}
 
-export interface CStoreHGetResponse extends CStoreBaseResponse<CStoreHGetResult> {}
+export interface CStoreHGetResponse<T = unknown> extends CStoreBaseResponse<CStoreHGetResult<T>> {}
 
-export interface CStoreHGetAllResponse extends CStoreBaseResponse<CStoreHGetAllResult> {}
+export interface CStoreHGetAllResponse<T = unknown> extends CStoreBaseResponse<CStoreHGetAllResult<T>> {}
 
 // Value types for chain store operations
 export type ChainStoreValue = string | number | boolean | object | any[]
