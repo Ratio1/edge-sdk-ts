@@ -1,6 +1,6 @@
 {
   "name": "@ratio1/edge-sdk-ts",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "SDK for interacting with Ratio1 edge node services (CStore and R1FS)",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
@@ -50,7 +50,7 @@
     "cross-fetch": "^4.1.0"
   },
   "optionalDependencies": {
-    "form-data": "^4.0.4"
+    "form-data": "^4.0.5"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
