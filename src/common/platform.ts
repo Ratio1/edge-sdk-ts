@@ -1,5 +1,6 @@
 function isBrowserEnv(): boolean {
-  return typeof window?.document !== 'undefined'
+  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+  return typeof window !== 'undefined' && typeof window.document !== 'undefined'
 }
 
 function hasFormDataPackage(): boolean {
