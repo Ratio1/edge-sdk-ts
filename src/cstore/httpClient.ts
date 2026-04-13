@@ -9,6 +9,8 @@ import {
   type CStoreHGetResult,
   type CStoreHSetResponse,
   type CStoreHSetResult,
+  type CStoreHSyncResponse,
+  type CStoreHSyncResult,
   type CStoreSetResponse,
   type CStoreSetResult,
   type CStoreStatusResponse,
@@ -17,6 +19,7 @@ import {
   type HGetAllRequest,
   type HGetRequest,
   type HSetRequest,
+  type HSyncRequest,
   type SetValueRequest
 } from './types'
 
@@ -112,6 +115,24 @@ export class CStoreHttpClient extends BaseHttpClient {
     const qs = this.buildQuery({ hkey: request.hkey })
     const res = await this.request(`/hgetall?${qs}`, { method: 'GET' })
     return await this.parseResponseFull<CStoreHGetAllResult<T>, CStoreHGetAllResponse<T>>(res)
+  }
+
+  async hsync(request: HSyncRequest): Promise<CStoreHSyncResult> {
+    const res = await this.hsyncFull(request)
+    return res.result
+  }
+
+  async hsyncFull(request: HSyncRequest): Promise<CStoreHSyncResponse> {
+    const chainstorePeers = this.resolveChainstorePeers()
+    const res = await this.request('/hsync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        hkey: request.hkey,
+        chainstore_peers: chainstorePeers
+      })
+    })
+    return await this.parseResponseFull<CStoreHSyncResult, CStoreHSyncResponse>(res)
   }
 
   private resolveChainstorePeers(): string[] {
