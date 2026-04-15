@@ -150,6 +150,37 @@ const allFields = await ratio1.cstore.hgetall({
   hkey: 'user:123'
 })
 // Returns: { success: true, result: { keys: ['name', 'email', 'age'] } }
+
+// Refresh one hash namespace from live peer state
+const syncResult = await ratio1.cstore.hsync({
+  hkey: 'user:123'
+})
+// Returns: { hkey: 'user:123', source_peer: '0xpeer', merged_fields: 2 }
+```
+
+`hsync` is merge-only:
+
+- remote fields missing locally are added
+- overlapping stale local fields are overwritten
+- local-only fields are preserved
+
+An empty snapshot from a valid peer is still success and returns
+`merged_fields: 0`. Timeout means no valid peer responded.
+
+#### Boot-Time Refresh Example
+
+Apps that need peer state before serving traffic can drive `hsync` from their
+own startup environment contract:
+
+```typescript
+const hkeys = (process.env.APP_CSTORE_HSYNC_HKEYS ?? '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean)
+
+for (const hkey of hkeys) {
+  await ratio1.cstore.hsync({ hkey })
+}
 ```
 
 #### Advanced Usage Examples

@@ -60,4 +60,33 @@ describe('cstore e2e', () => {
     const res = await client.cstore.hgetall({ hkey: 'e2e-hkey' })
     expect(res).toBeTruthy()
   })
+
+  it('hsync refreshes a hash namespace', async () => {
+    nock(cstoreBase)
+      .post('/hsync', { hkey: 'e2e-hkey', chainstore_peers: [] })
+      .reply(200, {
+        result: { hkey: 'e2e-hkey', source_peer: 'peer-a', merged_fields: 2 }
+      })
+
+    const res = await client.cstore.hsync({ hkey: 'e2e-hkey' })
+    expect(res).toEqual({ hkey: 'e2e-hkey', source_peer: 'peer-a', merged_fields: 2 })
+  })
+
+  it('hsyncFull returns the full response envelope', async () => {
+    nock(cstoreBase)
+      .post('/hsync', { hkey: 'e2e-hkey', chainstore_peers: [] })
+      .reply(200, {
+        result: { hkey: 'e2e-hkey', source_peer: 'peer-a', merged_fields: 0 },
+        ee_node_alias: 'node'
+      })
+
+    const res = await client.cstore.hsyncFull({ hkey: 'e2e-hkey' })
+    expect(res.result).toEqual({ hkey: 'e2e-hkey', source_peer: 'peer-a', merged_fields: 0 })
+    expect(res.ee_node_alias).toBe('node')
+  })
+
+  it('hsync validates that hkey is required', async () => {
+    await expect(client.cstore.hsync({ hkey: '' })).rejects.toThrow('hkey is required')
+    await expect(client.cstore.hsyncFull({ hkey: '' })).rejects.toThrow('hkey is required')
+  })
 })
