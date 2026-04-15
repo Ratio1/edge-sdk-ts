@@ -13,6 +13,12 @@ export type CStoreSetResult = boolean
 
 export type CStoreHSetResult = boolean
 
+export interface CStoreHSyncResult {
+  hkey: string
+  source_peer: string | null
+  merged_fields: number
+}
+
 export type CStoreHGetResult<T = unknown> = T
 
 export type CStoreHGetAllResult<T = unknown> = Record<string, T>
@@ -33,6 +39,8 @@ export interface CStoreGetResponse<T = unknown> extends CStoreBaseResponse<CStor
 export interface CStoreSetResponse extends CStoreBaseResponse<CStoreSetResult> {}
 
 export interface CStoreHSetResponse extends CStoreBaseResponse<CStoreHSetResult> {}
+
+export interface CStoreHSyncResponse extends CStoreBaseResponse<CStoreHSyncResult> {}
 
 export interface CStoreHGetResponse<T = unknown> extends CStoreBaseResponse<CStoreHGetResult<T>> {}
 
@@ -60,6 +68,10 @@ export interface HSetRequest {
 export interface HGetRequest {
   hkey: string
   key: string
+}
+
+export interface HSyncRequest {
+  hkey: string
 }
 
 export interface HGetAllRequest {

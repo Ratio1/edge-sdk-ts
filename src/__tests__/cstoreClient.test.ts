@@ -23,4 +23,22 @@ describe('CStoreClient', () => {
     const res = await ratio1.cstore.hgetall({ hkey: 'test' })
     expect(res).toBeDefined()
   })
+
+  it('hsync posts to the hsync endpoint with configured chainstore peers', async () => {
+    const ratio1 = createEdgeSdk({
+      cstoreUrl: baseUrl,
+      r1fsUrl: 'http://localhost:31235',
+      chainstorePeers: ['peer-a', 'peer-b'],
+      httpAdapter: { fetch: crossFetch as any }
+    })
+
+    nock(baseUrl)
+      .post('/hsync', { hkey: 'players', chainstore_peers: ['peer-a', 'peer-b'] })
+      .reply(200, {
+        result: { hkey: 'players', source_peer: 'peer-a', merged_fields: 2 }
+      })
+
+    const res = await ratio1.cstore.hsync({ hkey: 'players' })
+    expect(res).toEqual({ hkey: 'players', source_peer: 'peer-a', merged_fields: 2 })
+  })
 })

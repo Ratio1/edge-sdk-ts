@@ -8,6 +8,8 @@ import type {
   CStoreHGetResult,
   CStoreHSetResponse,
   CStoreHSetResult,
+  CStoreHSyncResponse,
+  CStoreHSyncResult,
   CStoreSetResponse,
   CStoreSetResult,
   CStoreStatusResponse,
@@ -16,6 +18,7 @@ import type {
   HGetAllRequest,
   HGetRequest,
   HSetRequest,
+  HSyncRequest,
   SetValueRequest
 } from './types'
 
@@ -86,5 +89,15 @@ export class CStoreService {
   async hgetallFull<T = unknown>(data: HGetAllRequest): Promise<CStoreHGetAllResponse<T>> {
     if (data.hkey === '') throw new Error('hkey is required')
     return await this.http.hgetallFull<T>(data)
+  }
+
+  async hsync(data: HSyncRequest): Promise<CStoreHSyncResult> {
+    if (data.hkey === '') throw new Error('hkey is required')
+    return await this.http.hsync(data)
+  }
+
+  async hsyncFull(data: HSyncRequest): Promise<CStoreHSyncResponse> {
+    if (data.hkey === '') throw new Error('hkey is required')
+    return await this.http.hsyncFull(data)
   }
 }
