@@ -24,6 +24,22 @@ describe('CStoreClient', () => {
     expect(res).toBeDefined()
   })
 
+  it('disables fetch caching for SDK requests', async () => {
+    const fetch = jest.fn(async () => new Response(JSON.stringify({ result: {} })))
+    const client = createEdgeSdk({
+      cstoreUrl: baseUrl,
+      r1fsUrl: 'http://localhost:31235',
+      httpAdapter: { fetch }
+    })
+
+    await client.cstore.hgetall({ hkey: 'test' })
+
+    expect(fetch).toHaveBeenCalledWith(`${baseUrl}/hgetall?hkey=test`, {
+      method: 'GET',
+      cache: 'no-store'
+    })
+  })
+
   it('hsync posts to the hsync endpoint with configured chainstore peers', async () => {
     const ratio1 = createEdgeSdk({
       cstoreUrl: baseUrl,

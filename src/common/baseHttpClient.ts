@@ -4,6 +4,7 @@ import type { BaseResponse } from './types'
 export interface RequestOptions {
   method: 'GET' | 'POST'
   headers?: Record<string, string>
+  cache?: RequestCache
   body?: string | FormData | any
 }
 
@@ -21,7 +22,7 @@ export class BaseHttpClient {
       console.debug('[edge-sdk-ts] request', { url, ...options })
     }
 
-    const res = await this.http.fetch(url, options)
+    const res = await this.http.fetch(url, { ...options, cache: 'no-store' })
     const duration = Date.now() - start
     if (this.verbose) {
       console.debug('[edge-sdk-ts] response', { url, status: res.status, duration })
